@@ -9,4 +9,4 @@
 1. Instalacja zależności `npm i`
 2. Przekopiuj plik `.env.example` do `.env`
 3. Wygeneruj hash hasła (np. https://bcrypt-generator.com/, Cost Factor `12`) i umieść go w `.env`
-4. Uruchom aplikację `npm start` lub z wykrywaniem zmian `npm run dev`
+4. Uruchom aplikację `npm start` lub z wykrywaniem zmian `npm run dev` (wymagany pakiet `nodemon`)
