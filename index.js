@@ -25,6 +25,7 @@ app.use((req, res, next) => {
 
 app.get("/leaderboard.html", (_req, res) => res.redirect("/leaderboard"));
 app.get("/admin.html", (_req, res) => res.redirect("/admin"));
+app.get("/admin-login.html", (_req, res) => res.redirect("/admin"));
 
 app.get("/register.html", (req, res) => {
   const { player_id } = req.cookies;
