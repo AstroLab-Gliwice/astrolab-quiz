@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstroLab Quiz - Ranking</title>
+  <link rel="shortcut icon" href="/logo.svg" type="image/x-icon" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .top-label {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #f59e0b;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .content {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn .5s ease-out;
+    }
+
+    /* ── Podium ──────────────────────────────────────────────── */
+    .podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .podium-item {
+      min-width: 0;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
+      text-align: center;
+      padding: 16px 12px;
+      flex: 1;
+      max-width: 140px;
+      border-top: 4px solid transparent;
+    }
+
+    .podium-item:nth-child(1) { border-color: #f59e0b; min-height: 120px; order: 2; }
+    .podium-item:nth-child(2) { border-color: #94a3b8; min-height: 100px; order: 1; }
+    .podium-item:nth-child(3) { border-color: #b45309; min-height:  85px; order: 3; }
+
+    .podium-medal { font-size: 1.4rem; margin-bottom: 4px; }
+    .podium-nick  { font-weight: 700; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .podium-score { color: var(--primary); font-size: 1rem; font-weight: 800; margin-top: 2px; }
+
+    /* ── Table ───────────────────────────────────────────────── */
+    .table-card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
+      overflow: hidden;
+    }
+
+    .table-header,
+    .table-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 70px;
+      padding: 10px 16px;
+      align-items: center;
+    }
+
+    .table-header {
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .table-row {
+      padding: 13px 16px;
+      border-bottom: 1px solid #f9fafb;
+      font-size: 14px;
+      transition: background .15s;
+    }
+
+    .table-row:last-child { border-bottom: none; }
+    .table-row:hover      { background: #fafafa; }
+
+    .rank  { color: #9ca3af; font-weight: 700; font-size: 13px; }
+    .nick  { font-weight: 600; }
+    .score { color: var(--primary); font-weight: 800; text-align: right; }
+
+    .empty, .loading {
+      text-align: center;
+      color: #9ca3af;
+      padding: 40px 20px;
+      font-size: 15px;
+    }
+
+    .loading { padding: 30px; font-size: 14px; }
+
+    @media (min-width: 400px) { body { padding: 40px 20px; } }
+  </style>
+</head>
+<body>
+  <div class="logo"><img src="/logo.svg" alt="AstroLab" /></div>
+
+  <h1>Ranking</h1>
+  <p class="top-label">🏆 TOP 15</p>
+  <p class="subtitle" id="subtitle">Ładowanie...</p>
+
+  <div class="content">
+    <div id="podium" class="podium" style="display:none"></div>
+    <div id="tableArea"><p class="loading">⏳ Ładowanie wyników...</p></div>
+    <button class="btn" id="refreshBtn">↻ Odśwież</button>
+    <a href="/" class="btn btn-outline">← Strona główna</a>
+  </div>
+
+  <footer>&copy; 2026 AstroLab &middot; Made with &hearts;</footer>
+
+  <script>
+    const MEDALS = ["🥇", "🥈", "🥉"];
+
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    async function load() {
+      document.getElementById("tableArea").innerHTML = '<p class="loading">⏳ Ładowanie...</p>';
+
+      try {
+        const res     = await fetch("/api/leaderboard");
+        const all     = await res.json();
+        const players = all.slice(0, 15);
+        const count   = all.length;
+
+        document.getElementById("subtitle").textContent =
+          count === 1 ? "Udział wziął 1 uczestnik" : `Łącznie udział wzięło ${count} uczestników`;
+
+        if (!players.length) {
+          document.getElementById("podium").style.display = "none";
+          document.getElementById("tableArea").innerHTML =
+            '<div class="table-card"><p class="empty">Brak wyników.<br>Znajdź kody QR i bądź pierwszy! 🎯</p></div>';
+          return;
+        }
+
+        const podiumEl = document.getElementById("podium");
+        if (players.length > 1) {
+          podiumEl.style.display = "flex";
+          podiumEl.innerHTML = players.slice(0, 3).map((p, i) => `
+            <div class="podium-item">
+              <div class="podium-medal">${MEDALS[i]}</div>
+              <div class="podium-nick">${esc(p.nick)}</div>
+              <div class="podium-score">${p.score} pkt</div>
+            </div>`).join("");
+        } else {
+          podiumEl.style.display = "none";
+        }
+
+        document.getElementById("tableArea").innerHTML = `
+          <div class="table-card">
+            <div class="table-header">
+              <span>#</span><span>Nick</span><span style="text-align:right">Punkty</span>
+            </div>
+            ${players.map((p, i) => `
+              <div class="table-row">
+                <span class="rank">${i + 1}</span>
+                <span class="nick">${esc(p.nick)}</span>
+                <span class="score">${p.score} pkt</span>
+              </div>`).join("")}
+          </div>`;
+
+      } catch {
+        document.getElementById("tableArea").innerHTML =
+          '<div class="table-card"><p class="empty">Błąd ładowania rankingu.</p></div>';
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", load);
+    load();
+    setInterval(load, 30_000);
+  </script>
+</body>
+</html>
