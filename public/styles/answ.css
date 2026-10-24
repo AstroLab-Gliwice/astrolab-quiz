@@ -1,0 +1,5 @@
+.info-card { padding: 36px 24px; }
+.info-card h1 { font-size: 23px; margin-top: 6px; }
+.info-card .big-icon { font-size: 52px; }
+.info-card .btn { margin-top: 5px; }
+@media (min-width: 400px) { body { padding: 40px; } }

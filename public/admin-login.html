@@ -6,80 +6,7 @@
   <title>AstroLab Quiz - Panel Administracyjny</title>
   <link rel="shortcut icon" href="/logo.svg" type="image/x-icon" />
   <link rel="stylesheet" href="/style.css" />
-  <style>
-    body { justify-content: center; }
-
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, .08);
-      padding: 40px 32px;
-      max-width: 360px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .card.animate {
-      animation: fadeIn .4s ease-out;
-    }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--primary);
-      text-align: center;
-    }
-
-    .lock { font-size: 36px; }
-
-    .pwd-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
-    .pwd-wrapper input {
-      width: 100%;
-      padding: 13px 44px 13px 16px;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color .2s;
-      box-sizing: border-box;
-    }
-
-    .pwd-wrapper input:focus { border-color: var(--accent); }
-
-    .pwd-toggle {
-      position: absolute;
-      right: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-    }
-
-    .pwd-toggle:hover { color: var(--primary); }
-
-    .error {
-      background: #fef2f2;
-      border: 1px solid #fca5a5;
-      color: #b91c1c;
-      font-size: 13px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      width: 100%;
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles/admlog.css">
 </head>
 <body>
   <div class="card">
@@ -90,55 +17,13 @@
     <div class="pwd-wrapper">
       <input type="password" id="pwd" placeholder="Wprowadź hasło..." autofocus />
       <button class="pwd-toggle" id="togglePwd" type="button" aria-label="Pokaż/ukryj hasło">
-        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
+        <img id="eyeIcon" src="/icons/vison_black.svg" />
       </button>
     </div>
-    <button class="btn" id="btn">Zaloguj się →</button>
+    <button class="btn" id="btn">Zaloguj się!</button>
     <a href="/" style="font-size:13px;color:var(--muted);text-decoration:none">← Powrót na stronę główną</a>
   </div>
 
-  <script>
-    async function login() {
-      const pwd = document.getElementById("pwd").value;
-      const err = document.getElementById("err");
-      err.style.display = "none";
-
-      const res = await fetch("/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pwd }),
-      });
-
-      if (res.ok) {
-        location.replace("/admin");
-      } else {
-        err.style.display = "block";
-        document.getElementById("pwd").select();
-      }
-    }
-
-    document.getElementById("btn").addEventListener("click", login);
-
-    document.getElementById("togglePwd").addEventListener("click", () => {
-      const input = document.getElementById("pwd");
-      const isPassword = input.type === "password";
-      input.type = isPassword ? "text" : "password";
-      document.getElementById("eyeIcon").innerHTML = isPassword
-        ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
-        : `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>`;
-    });
-
-    
-    document.getElementById("pwd").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") login();
-    });
-
-    const card = document.querySelector(".card");
-    card.classList.add("animate");
-    card.addEventListener("animationend", () => card.classList.remove("animate"), { once: true });
-  </script>
+  <script src="/scripts/admlog.js"></script>
 </body>
 </html>

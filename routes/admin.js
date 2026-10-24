@@ -3,6 +3,8 @@ const { randomBytes } = require("crypto");
 const bcrypt = require("bcryptjs");
 const rateLimit = require("express-rate-limit");
 const db = require("../database");
+const multer = require("multer");
+const path = require("path");
 const {
   isLeaderboardEnabled, setLeaderboardEnabled,
   isRegistrationEnabled, setRegistrationEnabled,
@@ -94,23 +96,23 @@ router.get("/admin/api/questions", requireAdmin, (_req, res) => {
 });
 
 router.post("/admin/api/questions", requireAdmin, (req, res) => {
-  const { question_text, answer, options, points } = req.body;
+  const { question_text, answer, options, diff, time, fileUri, points } = req.body;
   const err = validateQuestion({ question_text, answer, options });
   if (err) return res.status(400).json({ error: err });
 
   const code = randomBytes(3).toString("hex").toUpperCase().slice(0, 4);
   try {
     const info = db
-      .prepare("INSERT INTO questions (code, question_text, answer, options, points) VALUES (?, ?, ?, ?, ?)")
-      .run(code, question_text.trim(), answer.trim(), JSON.stringify(options.map((o) => o.trim())), points || 1);
+      .prepare("INSERT INTO questions (code, question_text, answer, options, difficulty, time, file, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+      .run(code, question_text.trim(), answer.trim(), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", points || 1);
     res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(info.lastInsertRowid)));
   } catch {
-    res.status(500).json({ error: "Błąd bazy danych." });
+    res.status(500).json({ error: "Błąd bazy danych. Jakiś dureń źle zrobił coś i nie działa." });
   }
 });
 
 router.put("/admin/api/questions/:id", requireAdmin, (req, res) => {
-  const { question_text, answer, options, points } = req.body;
+  const { question_text, answer, options, diff, time, fileUri, points } = req.body;
   const { id } = req.params;
 
   const err = validateQuestion({ question_text, answer, options });
@@ -120,8 +122,8 @@ router.put("/admin/api/questions/:id", requireAdmin, (req, res) => {
     return res.status(404).json({ error: "Nie znaleziono pytania." });
   }
 
-  db.prepare("UPDATE questions SET question_text = ?, answer = ?, options = ?, points = ? WHERE id = ?")
-    .run(question_text.trim(), answer.trim(), JSON.stringify(options.map((o) => o.trim())), points || 1, id);
+  db.prepare(`UPDATE questions SET question_text = ?, answer = ?, options = ?, difficulty = ?, time = ?, file = case when ? = '' then file else ? end, points = ? WHERE id = ?`)
+    .run(question_text.trim(), answer.trim(), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", fileUri || "", points || 1, id);
 
   res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(id)));
 });
@@ -134,6 +136,22 @@ router.delete("/admin/api/questions/:id", requireAdmin, (req, res) => {
   db.prepare("DELETE FROM answers WHERE question_id = ?").run(id);
   db.prepare("DELETE FROM questions WHERE id = ?").run(id);
   res.json({ success: true });
+});
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: "public/files",
+    filename: (req, file, cb) => {
+      cb(null, `${Math.floor(Math.random() * 9999999999999999)}${path.extname(file.originalname)}`);
+    },
+  }),
+}).single("file");
+
+router.post("/files", requireAdmin, upload, (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "Nie wybrano pliku. Pomijanie!!!!!!" });
+  }
+  res.json({ url: `/files/${req.file.filename}` });
 });
 
 // ── Players ───────────────────────────────────────────────────

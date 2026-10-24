@@ -18,7 +18,10 @@ db.exec(`
     code          TEXT NOT NULL UNIQUE,
     question_text TEXT NOT NULL,
     answer        TEXT NOT NULL,
+    file text default "",
     options       TEXT NOT NULL,
+    difficulty text not null,
+    time integer default 15,
     points        INTEGER DEFAULT 1
   );
 

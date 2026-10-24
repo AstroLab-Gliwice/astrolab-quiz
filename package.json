@@ -11,14 +11,15 @@
     "dev": "nodemon --ext js,html,css,json --no-warnings index.js"
   },
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=22.23.4"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "uuid": "^13.0.0",
-    "express-rate-limit": "^7.5.0"
+    "express-rate-limit": "^7.5.0",
+    "multer": "^2.5.0",
+    "uuid": "^13.0.0"
   }
 }

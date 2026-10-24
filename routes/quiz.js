@@ -31,7 +31,7 @@ router.get("/quiz/api/:id", (req, res) => {
   if (!player) return res.status(401).json({ error: "Wymagana rejestracja." });
 
   const question = db
-    .prepare("SELECT id, question_text, options, points FROM questions WHERE code = ?")
+    .prepare("SELECT id, question_text, options, difficulty, time, file, points FROM questions WHERE code = ?")
     .get(req.params.id);
   if (!question) return res.status(404).json({ error: "Nie ma takiego pytania." });
 
@@ -48,12 +48,15 @@ router.get("/quiz/api/:id", (req, res) => {
       id: question.id,
       text: question.question_text,
       options: JSON.parse(question.options),
+      difficulty: question.difficulty,
+      time: question.time,
+      file: question.file,
       points: question.points,
     },
     player,
     alreadyAnswered: !!attempt,
     wasCorrect: attempt?.correct === 1,
-    timelimit: getTimelimit(),
+    timelimit: question.time,
     startedAt: startRow?.started_at ?? null,
   });
 });
@@ -86,7 +89,7 @@ router.post("/quiz/:id/answer", (req, res) => {
   if (!player) return res.status(401).json({ error: "Wymagana rejestracja." });
 
   const question = db
-    .prepare("SELECT id, answer, points FROM questions WHERE code = ?")
+    .prepare("SELECT id, answer, difficulty, time, points FROM questions WHERE code = ?")
     .get(req.params.id);
   if (!question) return res.status(404).json({ error: "Nie ma takiego pytania." });
 
@@ -98,7 +101,7 @@ router.post("/quiz/:id/answer", (req, res) => {
     .prepare("SELECT started_at FROM question_starts WHERE player_id = ? AND question_id = ?")
     .get(player.id, question.id);
 
-  const timedOut = !startRow || (Date.now() - startRow.started_at) / 1000 > getTimelimit();
+  const timedOut = !startRow || (Date.now() - startRow.started_at) / 1000 > question.time;
   const correct =
     !timedOut &&
     req.body.answer?.trim().toLowerCase() === question.answer.trim().toLowerCase();
