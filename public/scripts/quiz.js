@@ -241,7 +241,7 @@ const questionId = location.pathname.split("/").filter(Boolean).pop();
           <div class="big-icon">⚠️</div>
           <h1>Już tu byłeś!</h1>
           <p>Już próbowałeś odpowiedzieć na to pytanie.</p>
-          <p style="margin-top:-10px">Szukaj kolejnego kodu QR!</p>
+          <p style="margin-top:-10px">Skanuj kolejne kody QR!</p>
           <a href="/" class="btn">← Wróć na stronę główną</a>
         </div>`;
     }

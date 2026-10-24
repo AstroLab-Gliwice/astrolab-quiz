@@ -1,5 +1,5 @@
  const p = new URLSearchParams(location.search);
-    const suffix = `<p style="margin-top:-10px">Szukaj kolejnego kodu QR!</p><a href="/" class="btn">← Wróć na stronę główną</a>`;
+    const suffix = `<p style="margin-top:-10px">Skanuj kolejne kody QR!</p><a href="/" class="btn">← Wróć na stronę główną</a>`;
 
     const content = p.get("alreadyAnswered") === "1"
       ? `<div class="big-icon">⚠️</div><h1>Już tu byłeś!</h1><p>Już próbowałeś odpowiedzieć na to pytanie.</p>${suffix}`
