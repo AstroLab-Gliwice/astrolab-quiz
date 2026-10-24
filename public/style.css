@@ -92,7 +92,7 @@ footer {
   width: 100%;
   padding: 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: 100px;
   background: var(--primary);
   color: #fff;
   font-weight: 700;
@@ -115,4 +115,8 @@ footer {
 
 .btn-outline:hover {
   background: #eef4f9;
+}
+
+input {
+  border-radius: 100px !important;
 }

@@ -123,8 +123,11 @@
               <button class="copy-url" onclick="copyUrl('${location.origin}/quiz/${esc(q.code)}')">📋</button>
             </td>
             <td class="q-text">${esc(q.question_text)}</td>
-            <td class="q-answer">✓ ${esc(q.answer)}</td>
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
+            <td class="q-answer">✓ ${esc(q.answer)}</td>
+            <td><a href="${esc(q.file)}">${esc(q.file)}</a></td>
+            <td>${esc(q.time)}</td>
+            <td>${esc(q.difficulty)}</td>
             <td><span class="points-badge">${q.points} pkt</span></td>
             <td>
               <div class="actions">

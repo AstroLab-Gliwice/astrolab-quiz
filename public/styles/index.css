@@ -65,8 +65,8 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 11px 16px;
-      border-radius: 10px;
+      padding: 9px 16px;
+      border-radius: 100px;
       font-size: 14px;
       font-weight: 600;
       text-decoration: none;
@@ -81,6 +81,16 @@
       color: #fff;
     }
 
+    .btn-github {
+      background: #202020;
+      color: #fff;
+    }
+
+    .btn-astrolab {
+      background: #0A3761;
+      color: #fff;
+    }
+
     .btn-instagram {
       background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4);
       color: #fff;
@@ -90,4 +100,8 @@
       width: 18px;
       height: 18px;
       flex-shrink: 0;
+    }
+    .social-icon {
+      aspect-ratio: 1/1;
+      width: 20px;
     }
