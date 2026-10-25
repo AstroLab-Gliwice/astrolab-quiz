@@ -606,7 +606,7 @@
           ctx.fillText("AL", cx, cy);
           onDone?.();
         };
-        img.src = "/logo-mono.svg";
+        img.src = "/logo/astrolab-mono.svg";
       }
 
       // ── Mobile sidebar toggle ─────────────────────────────────
