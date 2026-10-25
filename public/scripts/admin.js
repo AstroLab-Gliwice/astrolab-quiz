@@ -477,7 +477,7 @@
       let _qrParts;
       const DIFF_LABELS = { easy: "Łatwy", medi: "Normalny", hard: "Wymagający" };
       const QR_LABEL_H = 150;
-      const QR_LOGO_SCALE = 0.25;
+      const QR_LOGO_SCALE = 0.3;
 
       function openQR(code) {
         _currentQrUrl = `${location.origin}/quiz/${code}`;
@@ -578,7 +578,7 @@
           ctx.fill();
         }
         ctx.lineWidth = lw;
-        ctx.strokeStyle = "#083962";
+        ctx.strokeStyle = "#000000";
         ctx.stroke();
 
         const textX = (SIZE - (idW + gap * 2 + lw + labelW)) / 2;
@@ -603,7 +603,7 @@
         };
         img.onerror = () => {
           const r = Math.round(SIZE * 0.11);
-          ctx.fillStyle = "#083962";
+          ctx.fillStyle = "#000000";
           ctx.beginPath();
           ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
           ctx.fill();
@@ -614,7 +614,7 @@
           ctx.fillText("AL", cx, cy);
           onDone?.();
         };
-        img.src = "/logo.svg";
+        img.src = "/logo-mono.svg";
       }
 
       // ── Mobile sidebar toggle ─────────────────────────────────
