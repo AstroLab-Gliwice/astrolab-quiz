@@ -517,7 +517,7 @@
           d[i] = d[i + 1] = d[i + 2] = 0;
         }
         ctx.putImageData(imgData, 0, 0);
-        drawQrFooter(ctx, SIZE, id, label, false);
+        drawQrFooter(ctx, SIZE, id, label);
         overlayLogo(ctx, SIZE, () => downloadPng(out, "-transparent"));
       };
 
@@ -536,7 +536,9 @@
           correctLevel: QRCode.CorrectLevel.H,
         });
 
-        setTimeout(() => {
+        document.fonts.load(QR_ICON_FONT, QR_ICONS.join(" "))
+          .then((f) => { _qrIconOk = f.length > 0; }, () => { _qrIconOk = false; })
+          .then(() => setTimeout(() => {
           const src = hidden.querySelector("canvas");
           if (!src) { document.body.removeChild(hidden); return; }
 
@@ -554,41 +556,31 @@
           drawQrFooter(ctx, RENDER, id, label);
           _qrParts = { src, id, label };
           overlayLogo(ctx, RENDER);
-        }, 150);
+        }, 150));
       }
 
-      function drawQrFooter(ctx, SIZE, id, label, filled = true) {
-        const h = 84, lw = 5, padX = 56, gap = 30;
-        const y = SIZE + (QR_LABEL_H - h) / 2;
-        ctx.font = "700 48px Inter, Arial, sans-serif";
+      const QR_ICONS = ["signal_cellular_alt_1_bar", "signal_cellular_alt_2_bar", "signal_cellular_alt"];
+      const QR_ICON_FONT = '72px "Material Symbols Outlined"';
+      let _qrIconOk = false;
 
-        const idText = `#${id}`;
-        const idW = ctx.measureText(idText).width;
-        const labelW = ctx.measureText(label).width;
-        const maxIdW = Math.max(idW, ctx.measureText("#999").width);
-        const maxLabelW = Math.max(...Object.values(DIFF_LABELS).map((t) => ctx.measureText(t).width));
-
-        const w = Math.round(maxIdW + maxLabelW + gap * 2 + lw + padX * 2);
-        const x = Math.round((SIZE - w) / 2);
-
-        ctx.beginPath();
-        ctx.roundRect(x, y, w, h, h / 2);
-        if (filled) {
-          ctx.fillStyle = "#ffffff";
-          ctx.fill();
-        }
-        ctx.lineWidth = lw;
-        ctx.strokeStyle = "#000000";
-        ctx.stroke();
-
-        const textX = (SIZE - (idW + gap * 2 + lw + labelW)) / 2;
-        const textY = y + h / 2 + 2;
+      function drawQrFooter(ctx, SIZE, id, label) {
+        const cy = SIZE + QR_LABEL_H / 2;
         ctx.fillStyle = "#000000";
-        ctx.textAlign = "left";
         ctx.textBaseline = "middle";
-        ctx.fillText(idText, textX, textY);
-        ctx.fillRect(textX + idW + gap, y + 18, lw, h - 36);
-        ctx.fillText(label, textX + idW + gap * 2 + lw, textY);
+        ctx.font = "700 48px Inter, Arial, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`#${id}`, 60, cy + 2);
+        ctx.textAlign = "right";
+        ctx.fillText(label, SIZE - 60, cy + 2);
+        if (!_qrIconOk) return;
+
+        const x = SIZE - 142 - ctx.measureText(label).width;
+        ctx.font = QR_ICON_FONT;
+        ctx.textAlign = "left";
+        ctx.globalAlpha = 0.25;
+        ctx.fillText(QR_ICONS[2], x, cy + 1);
+        ctx.globalAlpha = 1;
+        ctx.fillText(QR_ICONS[Object.values(DIFF_LABELS).indexOf(label)], x, cy + 1);
       }
 
       function overlayLogo(ctx, SIZE, onDone) {
