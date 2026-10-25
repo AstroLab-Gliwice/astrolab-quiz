@@ -1,6 +1,3 @@
-
-
-
       // ── Helpers ───────────────────────────────────────────────
       function esc(s) {
         return String(s)
@@ -430,74 +427,54 @@
 
       // ── QR Code ───────────────────────────────────────────────
       let _currentQrUrl = "";
+      let _qrParts;
+      const DIFF_LABELS = { easy: "Łatwy", medi: "Normalny", hard: "Wymagający" };
+      const QR_LABEL_H = 150;
+      const QR_LOGO_SCALE = 0.25;
 
       function openQR(code) {
         _currentQrUrl = `${location.origin}/quiz/${code}`;
+        const q = questions.find((x) => x.code === code);
         document.getElementById("qrModalTitle").textContent = `Kod QR – ${code}`;
         document.getElementById("qrModalUrl").textContent   = _currentQrUrl;
         document.getElementById("qrModal").classList.add("open");
-        generateQR(_currentQrUrl);
+        generateQR(_currentQrUrl, q.id, DIFF_LABELS[q.difficulty]);
       }
 
       function closeQRModal() { document.getElementById("qrModal").classList.remove("open"); }
 
       document.getElementById("qrModalClose").onclick = closeQRModal;
 
-      document.getElementById("qrDownloadBtn").onclick = () => {
-        const canvas = document.getElementById("qrCanvas");
-        const link   = document.createElement("a");
-        link.download = `qr-${_currentQrUrl.split("/").pop()}.png`;
-        link.href     = canvas.toDataURL("image/png");
+      function downloadPng(canvas, suffix = "") {
+        const link = document.createElement("a");
+        link.download = `qr-${_currentQrUrl.split("/").pop()}${suffix}.png`;
+        link.href = canvas.toDataURL("image/png");
         link.click();
-      };
+      }
+
+      document.getElementById("qrDownloadBtn").onclick = () => downloadPng(document.getElementById("qrCanvas"));
 
       document.getElementById("qrDownloadTransparentBtn").onclick = () => {
-        const src  = document.getElementById("qrCanvas");
+        const { src, id, label } = _qrParts;
         const SIZE = src.width;
         const out  = document.createElement("canvas");
         out.width  = SIZE;
-        out.height = SIZE;
+        out.height = SIZE + QR_LABEL_H;
         const ctx  = out.getContext("2d");
 
         ctx.drawImage(src, 0, 0);
         const imgData = ctx.getImageData(0, 0, SIZE, SIZE);
         const d = imgData.data;
         for (let i = 0; i < d.length; i += 4) {
-          if (d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240) d[i + 3] = 0;
+          d[i + 3] = 255 - d[i];
+          d[i] = d[i + 1] = d[i + 2] = 0;
         }
         ctx.putImageData(imgData, 0, 0);
-
-        const logoSize = Math.round(SIZE * 0.20);
-        const pad      = Math.round(SIZE * 0.025);
-        const cx = SIZE / 2;
-        const cy = SIZE / 2;
-
-        const r = logoSize / 2 + pad;
-
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
-
-        const img = new Image();
-        img.onload = () => {
-          ctx.drawImage(img, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
-          const link = document.createElement("a");
-          link.download = `qr-${_currentQrUrl.split("/").pop()}-transparent.png`;
-          link.href = out.toDataURL("image/png");
-          link.click();
-        };
-        img.onerror = () => {
-          const link = document.createElement("a");
-          link.download = `qr-${_currentQrUrl.split("/").pop()}-transparent.png`;
-          link.href = out.toDataURL("image/png");
-          link.click();
-        };
-        img.src = "/logo.svg";
+        drawQrFooter(ctx, SIZE, id, label, false);
+        overlayLogo(ctx, SIZE, () => downloadPng(out, "-transparent"));
       };
 
-      function generateQR(url) {
+      function generateQR(url, id, label) {
         const RENDER = 800;
         const hidden = document.createElement("div");
         hidden.style.cssText = "position:absolute;left:-9999px;top:-9999px;";
@@ -507,7 +484,7 @@
           text: url,
           width: RENDER,
           height: RENDER,
-          colorDark:  "#083962",
+          colorDark: "#000000",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.H,
         });
@@ -517,34 +494,65 @@
           if (!src) { document.body.removeChild(hidden); return; }
 
           const canvas = document.getElementById("qrCanvas");
+          const H = RENDER + QR_LABEL_H;
           canvas.width  = RENDER;
-          canvas.height = RENDER;
+          canvas.height = H;
           const ctx = canvas.getContext("2d");
 
           ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, RENDER, RENDER);
+          ctx.fillRect(0, 0, RENDER, H);
           ctx.drawImage(src, 0, 0, RENDER, RENDER);
           document.body.removeChild(hidden);
+
+          drawQrFooter(ctx, RENDER, id, label);
+          _qrParts = { src, id, label };
           overlayLogo(ctx, RENDER);
         }, 150);
       }
 
-      function overlayLogo(ctx, SIZE) {
-        const logoSize = Math.round(SIZE * 0.20);
-        const pad      = Math.round(SIZE * 0.025);
+      function drawQrFooter(ctx, SIZE, id, label, filled = true) {
+        const h = 84, lw = 5, padX = 56, gap = 30;
+        const y = SIZE + (QR_LABEL_H - h) / 2;
+        ctx.font = "700 48px Inter, Arial, sans-serif";
+
+        const idText = `#${id}`;
+        const idW = ctx.measureText(idText).width;
+        const labelW = ctx.measureText(label).width;
+        const maxIdW = Math.max(idW, ctx.measureText("#999").width);
+        const maxLabelW = Math.max(...Object.values(DIFF_LABELS).map((t) => ctx.measureText(t).width));
+
+        const w = Math.round(maxIdW + maxLabelW + gap * 2 + lw + padX * 2);
+        const x = Math.round((SIZE - w) / 2);
+
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, h / 2);
+        if (filled) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+        }
+        ctx.lineWidth = lw;
+        ctx.strokeStyle = "#083962";
+        ctx.stroke();
+
+        const textX = (SIZE - (idW + gap * 2 + lw + labelW)) / 2;
+        const textY = y + h / 2 + 2;
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(idText, textX, textY);
+        ctx.fillRect(textX + idW + gap, y + 18, lw, h - 36);
+        ctx.fillText(label, textX + idW + gap * 2 + lw, textY);
+      }
+
+      function overlayLogo(ctx, SIZE, onDone) {
+        const logoSize = Math.round(SIZE * QR_LOGO_SCALE);
         const cx = SIZE / 2;
         const cy = SIZE / 2;
 
         const img = new Image();
         img.onload = () => {
-          const r = logoSize / 2 + pad;
-
-          ctx.fillStyle = "#ffffff";
-          ctx.beginPath();
-          ctx.arc(cx, cy, r, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.fill();
           ctx.drawImage(img, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
+          onDone?.();
         };
         img.onerror = () => {
           const r = Math.round(SIZE * 0.11);
@@ -557,6 +565,7 @@
           ctx.textAlign   = "center";
           ctx.textBaseline = "middle";
           ctx.fillText("AL", cx, cy);
+          onDone?.();
         };
         img.src = "/logo.svg";
       }
