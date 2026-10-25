@@ -5,6 +5,12 @@ function esc(s) {
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function emptyRow(tbodyId, text) {
+  const tbody = document.getElementById(tbodyId);
+  const cols = tbody.closest("table").querySelectorAll("thead th").length || 1;
+  tbody.innerHTML = `<tr class="empty-row"><td colspan="${cols}">${text}</td></tr>`;
+}
+
 function toast(msg, type = "ok") {
   const el = document.getElementById("toast");
   el.textContent = (type === "err" ? "❌ " : "✅ ") + msg;
@@ -84,6 +90,7 @@ document.getElementById("logoutBtn").onclick = async () => {
 
 // ── Dashboard ─────────────────────────────────────────────
 async function loadDashboard() {
+  emptyRow("topBody", "Ładowanie...");
   try {
     const [{ data: stats }, { data: players }] = await Promise.all([
       api("/astrolab-admin/api/stats"),
@@ -98,14 +105,16 @@ async function loadDashboard() {
     const MEDALS = ["🥇", "🥈", "🥉"];
     const top5 = (Array.isArray(players) ? players : []).slice(0, 5);
 
-    document.getElementById("topBody").innerHTML = top5.length
-      ? top5.map((x, i) =>
+    if (top5.length) {
+      document.getElementById("topBody").innerHTML = top5.map((x, i) =>
         `<tr>
                   <td class="rank-cell">${MEDALS[i] || i + 1}</td>
                   <td class="nick-cell">${esc(x.nick)}</td>
                   <td class="score-cell">${x.score} pkt</td>
-                </tr>`).join("")
-      : '<tr class="empty-row"><td colspan="3">Brak graczy</td></tr>';
+                </tr>`).join("");
+    } else {
+      emptyRow("topBody", "Brak graczy");
+    }
   } catch {
     toast("Błąd ładowania dashboardu", "err");
   }
@@ -115,7 +124,7 @@ async function loadDashboard() {
 let questions = [];
 
 async function loadQuestions() {
-  document.getElementById("qBody").innerHTML = '<tr class="empty-row"><td colspan="8">Ładowanie...</td></tr>';
+  emptyRow("qBody", "Ładowanie...");
   try {
     const { data } = await api("/astrolab-admin/api/questions");
     questions = Array.isArray(data) ? data : [];
@@ -128,7 +137,7 @@ async function loadQuestions() {
 function renderQuestions() {
   const tbody = document.getElementById("qBody");
   if (!questions.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Brak pytań. Dodaj pierwsze!</td></tr>';
+    emptyRow("qBody", "Brak pytań. Dodaj pierwsze!");
     return;
   }
   tbody.innerHTML = questions.map((q) => `
@@ -325,7 +334,7 @@ function syncAnswerSel() {
 let players = [];
 
 async function loadPlayers() {
-  document.getElementById("pBody").innerHTML = '<tr class="empty-row"><td colspan="7">Ładowanie...</td></tr>';
+  emptyRow("pBody", "Ładowanie...");
   try {
     const { data } = await api("/astrolab-admin/api/players");
     players = Array.isArray(data) ? data : [];
@@ -338,7 +347,7 @@ async function loadPlayers() {
 function renderPlayers(list) {
   const tbody = document.getElementById("pBody");
   if (!list.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Brak graczy</td></tr>';
+    emptyRow("pBody", "Brak graczy");
     return;
   }
   tbody.innerHTML = list.map((p, i) => `
