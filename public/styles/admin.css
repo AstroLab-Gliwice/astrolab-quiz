@@ -226,6 +226,10 @@
       min-width: 100px;
     }
     
+    .really-small-icon {
+      font-size: 12px !important;
+    }
+
     .q-text   { font-weight: 600; max-width: 1040px; }
     .q-answer { color: var(--green); font-weight: 600; font-size: 12px; }
     .opts-list { color: var(--muted); font-size: 12px; }
@@ -295,12 +299,18 @@
     .modal-close {
       width: 30px;
       height: 30px;
-      border-radius: 8px;
+      border-radius: 100px;
       background: #f3f4f6;
       border: none;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 16px !important;
+      font-family: 'Material Symbols Outlined';
       color: var(--muted);
+    }
+
+    .modal-close > span {
+      font-size: 16px !important;
+      font-family: 'Material Symbols Outlined';
     }
 
     .modal-close:hover { background: var(--border); }
@@ -420,8 +430,10 @@
       border: none;
     }
 
-    #confirmCancel { background: #f3f4f6; color: var(--text); }
-    #confirmOk     { background: var(--red); color: #fff; }
+    #confirmCancel { background: #f3f4f6; border-radius: 100px; color: var(--text); }
+    #confirmCancelEdit { background: #f3f4f6; border-radius: 100px; color: var(--text); }
+    #confirmOk     { background: var(--red); border-radius: 100px; color: #fff; }
+    #confirmEdit     { background: var(--accent); border-radius: 100px; color: #fff; }
 
     /* ── Toast ───────────────────────────────────────────────── */
     .toast {
@@ -607,3 +619,6 @@
         width: 20px;
     }
 
+    .really-larger-icon {
+      font-size: 30px !important;
+    }

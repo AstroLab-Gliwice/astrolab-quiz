@@ -167,6 +167,16 @@ router.get("/astrolab-admin/api/players", requireAdmin, (_req, res) => {
   );
 });
 
+router.put("/astrolab-admin/api/players/:id", requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const nick = req.body.nick?.trim();
+  if (!db.prepare("SELECT id FROM players WHERE id = ?").get(id)) {
+    return res.status(404).json({ error: "Nie znaleziono gracza." });
+  }
+  db.prepare("update players set nick = ? where id = ?").run(nick, id);
+  res.json({ success: true });
+});
+
 router.delete("/astrolab-admin/api/players/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   if (!db.prepare("SELECT id FROM players WHERE id = ?").get(id)) {

@@ -8,6 +8,7 @@
   <link rel="shortcut icon" href="/logo.svg" type="image/x-icon" />
   <link rel="stylesheet" href="/fonts.css" />
   <link rel="stylesheet" href="/styles/admin.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <script src="/vendor/qrcode.min.js"></script>
 </head>
 
@@ -34,12 +35,16 @@
       </div>
     </a>
     <button id="sidebarCloseBtn" class="sb-close-btn"
-      style="display:none;position:absolute;top:14px;right:14px;background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:8px;font-size:18px;cursor:pointer;align-items:center;justify-content:center;">✕</button>
+      style="display:none;position:absolute;top:14px;right:14px;background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:8px;font-size:18px;cursor:pointer;align-items:center;justify-content:center;"><span class="material-symbols-outlined">
+      close
+    </span></button>
     <button class="nav-btn active" data-page="dashboard"><img src="icons/dashie.svg" class="icon-small"> Dashboard</button>
     <button class="nav-btn" data-page="questions"><img src="icons/questions.svg" class="icon-small"> Pytania</button>
     <button class="nav-btn" data-page="players"><img src="icons/ppl.svg" class="icon-small"> Gracze</button>
     <button class="nav-btn" data-page="settings"><img src="icons/settings.svg" class="icon-small"> Ustawienia</button>
-    <button class="logout-btn" id="logoutBtn" style="justify-content:center;margin-top:8px"><img src="icons/logoff.svg" class="icon-small"> Wyloguj</button>
+    <button class="logout-btn" id="logoutBtn" style="justify-content:center;margin-top:8px"><span class="material-symbols-outlined">
+logout
+</span> Wyloguj</button>
   </aside>
 
   <main class="main">
@@ -50,10 +55,18 @@
         <p>Przegląd stanu quizu</p>
       </div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon">❓</div><div class="stat-value" id="s-q">—</div><div class="stat-label">Pytania</div></div>
-        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="s-p">—</div><div class="stat-label">Gracze</div></div>
-        <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value" id="s-a">—</div><div class="stat-label">Odpowiedzi</div></div>
-        <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="s-c">—</div><div class="stat-label">Poprawnych</div></div>
+        <div class="stat-card"><div class="stat-icon"><span class="material-symbols-outlined really-larger-icon stat-value">
+question_mark
+</span></div><div class="stat-value" id="s-q">—</div><div class="stat-label">Pytania</div></div>
+        <div class="stat-card"><div class="stat-icon"><span class="material-symbols-outlined really-larger-icon stat-value">
+groups
+</span></div><div class="stat-value" id="s-p">—</div><div class="stat-label">Gracze</div></div>
+        <div class="stat-card"><div class="stat-icon"><span class="material-symbols-outlined really-larger-icon stat-value">
+forum
+</span></div><div class="stat-value" id="s-a">—</div><div class="stat-label">Odpowiedzi</div></div>
+        <div class="stat-card"><div class="stat-icon"><span class="material-symbols-outlined really-larger-icon stat-value">
+done_all
+</span></div><div class="stat-value" id="s-c">—</div><div class="stat-label">Poprawnych</div></div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -85,7 +98,7 @@
             <thead>
               <tr><th>ID</th><th>Kod</th><th>URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedź</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
             </thead>
-            <tbody id="qBody"><tr class="empty-row"><td colspan="8">Ładowanie...</td></tr></tbody>
+            <tbody id="qBody"><tr class="empty-row"><td colspan="11">Ładowanie...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -179,7 +192,9 @@
       <div class="modal">
         <div class="modal-hdr">
           <h2 id="qModalTitle">Nowe pytanie</h2>
-          <button class="modal-close" id="qModalClose">✕</button>
+          <button class="modal-close" id="qModalClose"><span class="material-symbols-outlined">
+          close
+        </span></button>
         </div>
         <div class="modal-body">
           <div class="modal-err" id="qErr"></div>
@@ -236,8 +251,12 @@
             <div class="qr-url-label" id="qrModalUrl"></div>
             <canvas id="qrCanvas" style="border-radius:14px;box-shadow:0 6px 24px rgba(8,57,98,.15);width:280px;height:auto;display:block;"></canvas>
             <div class="qr-actions">
-              <button class="btn btn-primary" id="qrDownloadBtn">⬇️ Z tłem</button>
-              <button class="btn btn-qr" id="qrDownloadTransparentBtn">⬇️ Bez tła</button>
+              <button class="btn btn-primary" id="qrDownloadBtn"><span class="material-symbols-outlined">
+download
+</span> Z tłem</button>
+              <button class="btn btn-qr" id="qrDownloadTransparentBtn"><span class="material-symbols-outlined">
+download
+</span> Bez tła</button>
             </div>
           </div>
         </div>
@@ -253,6 +272,20 @@
         <div class="confirm-btns">
           <button id="confirmCancel">Anuluj</button>
           <button id="confirmOk">Usuń</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="editOverlay">
+      <div class="confirm-box">
+        <div class="confirm-icon"><span class="material-symbols-outlined">
+person_edit
+</span></div>
+        <h3 id="confirmTitle2"></h3>
+        <p id="confirmMsg2"></p>
+        <div class="confirm-btns">
+          <button id="confirmCancelEdit">Anuluj</button>
+          <button id="confirmEdit">Zmień dane</button>
         </div>
       </div>
     </div>

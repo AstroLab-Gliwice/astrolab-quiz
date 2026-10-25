@@ -30,8 +30,20 @@
         _confirmResolve = null;
       };
 
+      document.getElementById("confirmEdit").onclick = () => {
+        document.getElementById("editOverlay").classList.remove("open");
+        _confirmResolve?.(true);
+        _confirmResolve = null;
+      };
+
       document.getElementById("confirmCancel").onclick = () => {
         document.getElementById("confirmOverlay").classList.remove("open");
+        _confirmResolve?.(false);
+        _confirmResolve = null;
+      };
+
+      document.getElementById("confirmCancelEdit").onclick = () => {
+        document.getElementById("editOverlay").classList.remove("open");
         _confirmResolve?.(false);
         _confirmResolve = null;
       };
@@ -41,6 +53,14 @@
         document.getElementById("confirmTitle").textContent = title;
         document.getElementById("confirmMsg").textContent = msg;
         document.getElementById("confirmOverlay").classList.add("open");
+        return new Promise((r) => { _confirmResolve = r; });
+      }
+
+      function openInput(title, msg) {
+        _confirmResolve?.(false);
+        document.getElementById("confirmTitle2").textContent = title;
+        document.getElementById("confirmMsg2").innerHTML = msg;
+        document.getElementById("editOverlay").classList.add("open");
         return new Promise((r) => { _confirmResolve = r; });
       }
 
@@ -117,7 +137,11 @@
             <td><span class="code-badge">${esc(q.code)}</span></td>
             <td>
               <span class="url-cell">/quiz/${esc(q.code)}</span>
-              <button class="copy-url" onclick="copyUrl('${location.origin}/quiz/${esc(q.code)}')">📋</button>
+              <button class="copy-url" onclick="copyUrl('${location.origin}/quiz/${esc(q.code)}')">
+                <span class="material-symbols-outlined really-small-icon">
+                  content_copy
+                </span>
+              </button>
             </td>
             <td class="q-text">${esc(q.question_text)}</td>
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
@@ -128,9 +152,15 @@
             <td><span class="points-badge">${q.points} pkt</span></td>
             <td>
               <div class="actions">
-                <button class="btn btn-qr btn-sm" onclick="openQR('${esc(q.code)}')">📱 QR</button>
-                <button class="btn btn-edit btn-sm" onclick="openEditQ(${q.id})">✏️ Edytuj</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteQ(${q.id})">🗑️</button>
+                <button class="btn btn-qr btn-sm" onclick="openQR('${esc(q.code)}')"><span class="material-symbols-outlined">
+                  qr_code_scanner
+                </span></button>
+                <button class="btn btn-edit btn-sm" onclick="openEditQ(${q.id})"><span class="material-symbols-outlined">
+                  edit
+                </span></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteQ(${q.id})"><span class="material-symbols-outlined">
+                  delete
+                </span></button>
               </div>
             </td>
           </tr>`).join("");
@@ -154,6 +184,7 @@
       function openAddQ() {
         editingQId = null;
         document.getElementById("qModalTitle").textContent = "Nowe pytanie";
+        document.querySelector("#fFile").value = "";
         document.getElementById("fText").value = "";
         document.getElementById("fPoints").value = 1;
         document.getElementById("qErr").style.display = "none";
@@ -318,9 +349,18 @@
             <td style="color:var(--muted)">${p.total_answers}</td>
             <td style="color:var(--green);font-weight:600">${p.correct_answers}</td>
             <td style="color:var(--muted);font-size:12px">${(p.created_at || "").slice(0, 16).replace("T", " ") || "—"}</td>
-            <td><button class="btn btn-danger btn-sm"
+            <td>
+              <button class="btn btn-edit btn-sm" data-id="${esc(p.id)}" data-nick="${esc(p.nick)}" onclick="changeP(this.dataset.id, this.dataset.nick)"><span class="material-symbols-outlined">
+                edit
+              </span>
+              </button>
+            <button class="btn btn-danger btn-sm"
               data-id="${esc(p.id)}" data-nick="${esc(p.nick)}"
-              onclick="deleteP(this.dataset.id, this.dataset.nick)">🗑️ Usuń</button></td>
+              onclick="deleteP(this.dataset.id, this.dataset.nick)"><span class="material-symbols-outlined">
+                  delete
+                </span></button></td>
+              
+            
           </tr>`).join("");
       }
 
@@ -333,6 +373,13 @@
         if (!await openConfirm("Usuń gracza", `Usunąć gracza "${nick}"?\nZostaną usunięte też jego odpowiedzi.`)) return;
         const { ok } = await api(`/astrolab-admin/api/players/${id}`, { method: "DELETE" });
         ok ? (toast("Gracz usunięty."), loadPlayers()) : toast("Błąd usuwania.", "err");
+      }
+
+      async function changeP(id, nick) {
+        if (!await openInput("Zmień nickname gracza", `<p>Zmień nickname gracza "${nick}":</p><div class="field"><input type="input" id="nicknameChange" value="${esc(nick)}"></div>`)) return;
+        const nickname = document.querySelector("#nicknameChange").value;
+        const { ok, data } = await api(`/astrolab-admin/api/players/${id}`, { method: "PUT", body: JSON.stringify({ nick: nickname }) });
+        ok ? (toast("Zmieniono nickname gracza."), loadPlayers()) : toast("Błąd zmiany nickname'u gracza.", "err");
       }
 
       // ── Settings ──────────────────────────────────────────────
