@@ -5,6 +5,7 @@ const rateLimit = require("express-rate-limit");
 const db = require("../database");
 const multer = require("multer");
 const path = require("path");
+const { join } = path;
 const {
   isLeaderboardEnabled, setLeaderboardEnabled,
   isRegistrationEnabled, setRegistrationEnabled,
@@ -34,7 +35,7 @@ function requireAdmin(req, res, next) {
   if (req.headers.accept?.includes("application/json")) {
     return res.status(401).json({ error: "Nieautoryzowany dostęp." });
   }
-  res.redirect("/admin/login");
+  res.redirect("/astrolab-admin/login");
 }
 
 function validateQuestion({ question_text, answer, options }) {
@@ -50,12 +51,12 @@ function validateQuestion({ question_text, answer, options }) {
 const parseQuestion = (q) => ({ ...q, options: JSON.parse(q.options) });
 
 // ── Auth ──────────────────────────────────────────────────────
-router.get("/admin/login", (req, res) => {
-  if (req.cookies[ADMIN_COOKIE] === SESSION_TOKEN) return res.redirect("/admin");
-  res.sendFile("admin-login.html", { root: "./public" });
+router.get("/astrolab-admin/login", (req, res) => {
+  if (req.cookies[ADMIN_COOKIE] === SESSION_TOKEN) return res.redirect("/astrolab-admin");
+  res.sendFile("admin-login.html", { root: join(__dirname, "..", "views") });
 });
 
-router.post("/admin/login", loginLimiter, async (req, res) => {
+router.post("/astrolab-admin/login", loginLimiter, async (req, res) => {
   const { password } = req.body;
 
   const valid = password && await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
@@ -71,17 +72,17 @@ router.post("/admin/login", loginLimiter, async (req, res) => {
   res.json({ success: true });
 });
 
-router.post("/admin/logout", (_req, res) => {
+router.post("/astrolab-admin/logout", (_req, res) => {
   res.clearCookie(ADMIN_COOKIE);
   res.json({ success: true });
 });
 
-router.get("/admin", requireAdmin, (_req, res) => {
-  res.sendFile("admin.html", { root: "./public" });
+router.get("/astrolab-admin", requireAdmin, (_req, res) => {
+  res.sendFile("admin.html", { root: join(__dirname, "..", "views") });
 });
 
 // ── Stats ─────────────────────────────────────────────────────
-router.get("/admin/api/stats", requireAdmin, (_req, res) => {
+router.get("/astrolab-admin/api/stats", requireAdmin, (_req, res) => {
   res.json({
     players:   db.prepare("SELECT COUNT(*) AS c FROM players").get().c,
     questions: db.prepare("SELECT COUNT(*) AS c FROM questions").get().c,
@@ -91,11 +92,11 @@ router.get("/admin/api/stats", requireAdmin, (_req, res) => {
 });
 
 // ── Questions ─────────────────────────────────────────────────
-router.get("/admin/api/questions", requireAdmin, (_req, res) => {
+router.get("/astrolab-admin/api/questions", requireAdmin, (_req, res) => {
   res.json(db.prepare("SELECT * FROM questions ORDER BY id ASC").all().map(parseQuestion));
 });
 
-router.post("/admin/api/questions", requireAdmin, (req, res) => {
+router.post("/astrolab-admin/api/questions", requireAdmin, (req, res) => {
   const { question_text, answer, options, diff, time, fileUri, points } = req.body;
   const err = validateQuestion({ question_text, answer, options });
   if (err) return res.status(400).json({ error: err });
@@ -111,7 +112,7 @@ router.post("/admin/api/questions", requireAdmin, (req, res) => {
   }
 });
 
-router.put("/admin/api/questions/:id", requireAdmin, (req, res) => {
+router.put("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
   const { question_text, answer, options, diff, time, fileUri, points } = req.body;
   const { id } = req.params;
 
@@ -128,7 +129,7 @@ router.put("/admin/api/questions/:id", requireAdmin, (req, res) => {
   res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(id)));
 });
 
-router.delete("/admin/api/questions/:id", requireAdmin, (req, res) => {
+router.delete("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   if (!db.prepare("SELECT id FROM questions WHERE id = ?").get(id)) {
     return res.status(404).json({ error: "Nie znaleziono pytania." });
@@ -155,7 +156,7 @@ router.post("/files", requireAdmin, upload, (req, res) => {
 });
 
 // ── Players ───────────────────────────────────────────────────
-router.get("/admin/api/players", requireAdmin, (_req, res) => {
+router.get("/astrolab-admin/api/players", requireAdmin, (_req, res) => {
   res.json(
     db.prepare(`
       SELECT p.id, p.nick, p.score, p.created_at,
@@ -166,7 +167,7 @@ router.get("/admin/api/players", requireAdmin, (_req, res) => {
   );
 });
 
-router.delete("/admin/api/players/:id", requireAdmin, (req, res) => {
+router.delete("/astrolab-admin/api/players/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   if (!db.prepare("SELECT id FROM players WHERE id = ?").get(id)) {
     return res.status(404).json({ error: "Nie znaleziono gracza." });
@@ -177,29 +178,29 @@ router.delete("/admin/api/players/:id", requireAdmin, (req, res) => {
 });
 
 // ── Settings ──────────────────────────────────────────────────
-router.get("/admin/api/settings/leaderboard", requireAdmin, (_req, res) => {
+router.get("/astrolab-admin/api/settings/leaderboard", requireAdmin, (_req, res) => {
   res.json({ enabled: isLeaderboardEnabled() });
 });
 
-router.post("/admin/api/settings/leaderboard", requireAdmin, (req, res) => {
+router.post("/astrolab-admin/api/settings/leaderboard", requireAdmin, (req, res) => {
   setLeaderboardEnabled(!!req.body.enabled);
   res.json({ enabled: isLeaderboardEnabled() });
 });
 
-router.get("/admin/api/settings/registration", requireAdmin, (_req, res) => {
+router.get("/astrolab-admin/api/settings/registration", requireAdmin, (_req, res) => {
   res.json({ enabled: isRegistrationEnabled() });
 });
 
-router.post("/admin/api/settings/registration", requireAdmin, (req, res) => {
+router.post("/astrolab-admin/api/settings/registration", requireAdmin, (req, res) => {
   setRegistrationEnabled(!!req.body.enabled);
   res.json({ enabled: isRegistrationEnabled() });
 });
 
-router.get("/admin/api/settings/timelimit", requireAdmin, (_req, res) => {
+router.get("/astrolab-admin/api/settings/timelimit", requireAdmin, (_req, res) => {
   res.json({ seconds: getTimelimit() });
 });
 
-router.post("/admin/api/settings/timelimit", requireAdmin, (req, res) => {
+router.post("/astrolab-admin/api/settings/timelimit", requireAdmin, (req, res) => {
   res.json({ seconds: setTimelimit(req.body.seconds) });
 });
 

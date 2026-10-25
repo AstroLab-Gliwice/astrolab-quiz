@@ -3,7 +3,7 @@
 ## Informacje
 - Wymagania: `node.js >= 22.23.4`, `npm`, `prąd`
 - Jeśli w pliku `.env` nie znajduje się hash hasła to tymczasowym hasłem jest `admin123`
-- Panel zarządzania znajduje się pod `/admin`
+- Panel zarządzania znajduje się pod `/astrolab-admin`
 
 ## Start
 1. Instalacja zależności `npm i`

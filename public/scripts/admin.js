@@ -58,16 +58,16 @@
       document.querySelectorAll(".nav-btn").forEach((b) => { b.onclick = () => goTo(b.dataset.page); });
 
       document.getElementById("logoutBtn").onclick = async () => {
-        await api("/admin/logout", { method: "POST" });
-        location.replace("/admin/login");
+        await api("/astrolab-admin/logout", { method: "POST" });
+        location.replace("/astrolab-admin/login");
       };
 
       // ── Dashboard ─────────────────────────────────────────────
       async function loadDashboard() {
         try {
           const [{ data: stats }, { data: players }] = await Promise.all([
-            api("/admin/api/stats"),
-            api("/admin/api/players"),
+            api("/astrolab-admin/api/stats"),
+            api("/astrolab-admin/api/players"),
           ]);
 
           document.getElementById("s-q").textContent = stats.questions ?? "—";
@@ -97,7 +97,7 @@
       async function loadQuestions() {
         document.getElementById("qBody").innerHTML = '<tr class="empty-row"><td colspan="8">Ładowanie...</td></tr>';
         try {
-          const { data } = await api("/admin/api/questions");
+          const { data } = await api("/astrolab-admin/api/questions");
           questions = Array.isArray(data) ? data : [];
           renderQuestions();
         } catch {
@@ -144,7 +144,7 @@
         const q = questions.find((x) => x.id === id);
         if (!q) return;
         if (!await openConfirm("Usuń pytanie", `Usunąć "${q.question_text}"?\nZostaną usunięte też odpowiedzi graczy.`)) return;
-        const { ok } = await api(`/admin/api/questions/${id}`, { method: "DELETE" });
+        const { ok } = await api(`/astrolab-admin/api/questions/${id}`, { method: "DELETE" });
         ok ? (toast("Pytanie usunięte."), loadQuestions()) : toast("Błąd usuwania.", "err");
       }
 
@@ -212,7 +212,7 @@
           return;
         }
 
-        const url    = editingQId ? `/admin/api/questions/${editingQId}` : "/admin/api/questions";
+        const url    = editingQId ? `/astrolab-admin/api/questions/${editingQId}` : "/astrolab-admin/api/questions";
         const method = editingQId ? "PUT" : "POST";
 
         if (file != null) {
@@ -296,7 +296,7 @@
       async function loadPlayers() {
         document.getElementById("pBody").innerHTML = '<tr class="empty-row"><td colspan="7">Ładowanie...</td></tr>';
         try {
-          const { data } = await api("/admin/api/players");
+          const { data } = await api("/astrolab-admin/api/players");
           players = Array.isArray(data) ? data : [];
           renderPlayers(players);
         } catch {
@@ -331,7 +331,7 @@
 
       async function deleteP(id, nick) {
         if (!await openConfirm("Usuń gracza", `Usunąć gracza "${nick}"?\nZostaną usunięte też jego odpowiedzi.`)) return;
-        const { ok } = await api(`/admin/api/players/${id}`, { method: "DELETE" });
+        const { ok } = await api(`/astrolab-admin/api/players/${id}`, { method: "DELETE" });
         ok ? (toast("Gracz usunięty."), loadPlayers()) : toast("Błąd usuwania.", "err");
       }
 
@@ -372,9 +372,9 @@
       }
 
       document.getElementById("leaderboardToggle").onchange =
-        makeToggleHandler("/admin/api/settings/leaderboard", TOGGLE_CONFIG.leaderboard);
+        makeToggleHandler("/astrolab-admin/api/settings/leaderboard", TOGGLE_CONFIG.leaderboard);
       document.getElementById("registrationToggle").onchange =
-        makeToggleHandler("/admin/api/settings/registration", TOGGLE_CONFIG.registration);
+        makeToggleHandler("/astrolab-admin/api/settings/registration", TOGGLE_CONFIG.registration);
 
       /* function updateTimelimitStatus(seconds) {
         const m     = Math.floor(seconds / 60);
@@ -387,9 +387,9 @@
       async function loadSettings() {
         try {
           const [{ data: lb }, { data: reg }] = await Promise.all([
-            api("/admin/api/settings/leaderboard"),
-            api("/admin/api/settings/registration"),
-            //api("/admin/api/settings/timelimit"),
+            api("/astrolab-admin/api/settings/leaderboard"),
+            api("/astrolab-admin/api/settings/registration"),
+            //api("/astrolab-admin/api/settings/timelimit"),
           ]);
 
           document.getElementById("leaderboardToggle").checked  = lb.enabled;
@@ -409,7 +409,7 @@
         const val = parseInt(document.getElementById("timelimitInput").value);
         if (!val || val < 5 || val > 600) { toast("Podaj wartość od 5 do 600 sekund.", "err"); return; }
         try {
-          const { ok, data } = await api("/admin/api/settings/timelimit", {
+          const { ok, data } = await api("/astrolab-admin/api/settings/timelimit", {
             method: "POST",
             body: JSON.stringify({ seconds: val }),
           });

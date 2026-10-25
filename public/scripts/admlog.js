@@ -5,14 +5,14 @@ async function login() {
       const err = document.getElementById("err");
       err.style.display = "none";
 
-      const res = await fetch("/admin/login", {
+      const res = await fetch("/astrolab-admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: pwd }),
       });
 
       if (res.ok) {
-        location.replace("/admin");
+        location.replace("/astrolab-admin");
       } else {
         err.style.display = "block";
         document.getElementById("pwd").select();
