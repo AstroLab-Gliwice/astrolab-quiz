@@ -214,14 +214,14 @@ const questionId = location.pathname.split("/").filter(Boolean).pop();
         });
         const data = await res.json();
 
-        if (res.status === 409) { location.replace("/answer.html?alreadyAnswered=1"); return; }
+        if (res.status === 409) { location.replace("/answer?alreadyAnswered=1"); return; }
 
         document.querySelectorAll(".answer").forEach((el) => el.classList.add("disabled"));
         if (submitBtn) submitBtn.classList.remove("active");
 
         const wasTimeout = isTimeout || data.timedOut;
         if (submitBtn) submitBtn.textContent = wasTimeout ? "⏰ Czas minął!" : "Wysyłanie...";
-        setTimeout(() => location.replace(wasTimeout ? "/answer.html?timeout=1" : "/answer.html"), 600);
+        setTimeout(() => location.replace(wasTimeout ? "/answer?timeout=1" : "/answer"), 600);
       } catch {
         if (submitBtn) {
           submitBtn.disabled = false;

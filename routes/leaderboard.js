@@ -1,12 +1,14 @@
 const { Router } = require("express");
+const { join } = require("path");
 const db = require("../database");
 const { isLeaderboardEnabled } = require("./settings");
 
 const router = Router();
+const VIEWS = join(__dirname, "..", "views");
 
 router.get("/leaderboard", (_req, res) => {
   const file = isLeaderboardEnabled() ? "leaderboard.html" : "leaderboard-off.html";
-  res.sendFile(file, { root: "./public" });
+  res.sendFile(file, { root: VIEWS });
 });
 
 router.get("/api/leaderboard", (_req, res) => {

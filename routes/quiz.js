@@ -1,8 +1,10 @@
 const { Router } = require("express");
+const { join } = require("path");
 const db = require("../database");
 const { getTimelimit } = require("./settings");
 
 const router = Router();
+const VIEWS = join(__dirname, "..", "views");
 
 const getPlayer = (req) => {
   const { player_id } = req.cookies;
@@ -20,9 +22,9 @@ router.get("/quiz/:id", (req, res) => {
     return res.redirect("/register?returnTo=" + encodeURIComponent(req.originalUrl));
   }
   if (!getQuestion(req.params.id)) {
-    return res.status(404).sendFile("404.html", { root: "./public" });
+    return res.status(404).sendFile("404.html", { root: VIEWS });
   }
-  res.sendFile("quiz.html", { root: "./public" });
+  res.sendFile("quiz.html", { root: VIEWS });
 });
 
 // ── API: get question state ───────────────────────────────────

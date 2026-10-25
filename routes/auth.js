@@ -1,9 +1,11 @@
 const { Router } = require("express");
+const { join } = require("path");
 const { v4: uuid } = require("uuid");
 const db = require("../database");
 const { isRegistrationEnabled } = require("./settings");
 
 const router = Router();
+const VIEWS = join(__dirname, "..", "views");
 
 router.get("/register", (req, res) => {
   const { player_id } = req.cookies;
@@ -11,9 +13,9 @@ router.get("/register", (req, res) => {
     return res.redirect(req.query.returnTo || "/leaderboard");
   }
   if (!isRegistrationEnabled()) {
-    return res.sendFile("register-off.html", { root: "./public" });
+    return res.sendFile("register-off.html", { root: VIEWS });
   }
-  res.sendFile("register.html", { root: "./public" });
+  res.sendFile("register.html", { root: VIEWS });
 });
 
 router.post("/register", (req, res) => {
