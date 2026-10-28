@@ -991,3 +991,64 @@ td {
 .really-larger-icon {
   font-size: 30px !important;
 }
+
+.hidden {
+  display: none;
+}
+
+.nextToNext {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+#addAnswer, #removeAnswer {
+  transition: 0.2s all;
+  padding: 4px 8px;
+  border-radius: 100px;
+  background-color: var(--light);
+  border: 1px solid var(--blue-border);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+#addAnswer:hover, #removeAnswer:hover {
+    background: var(--blue-bg) !important;
+}
+
+#fAnswers {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border: 2px solid transparent;
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb {
+  transition: 0.2s all;
+  filter: brightness(1);
+  background: var(--accent);
+  border-radius: 100px;
+  margin: 2px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(0.5);
+  background-clip: padding-box;
+}
+
+
+.modal {
+  margin-right: 15px;
+}

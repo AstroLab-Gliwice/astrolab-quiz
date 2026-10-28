@@ -39,16 +39,16 @@ function requireAdmin(req, res, next) {
 }
 
 function validateQuestion({ question_text, answer, options }) {
-  if (!question_text?.trim() || !answer?.trim() || !Array.isArray(options) || options.length < 2) {
-    return "Wypełnij wszystkie wymagane pola.";
+  if (!question_text?.trim() || (answer?.length == 0) || !Array.isArray(options) || options.length < 2) {
+    return "Wypełnij wszystkie wymagane pola poprawnie. (Błąd zapisu do bazy danych)";
   }
-  if (!options.map((o) => o.trim().toLowerCase()).includes(answer.trim().toLowerCase())) {
-    return "Odpowiedź musi być jedną z opcji.";
+  if (answer.some(a => !options.map((o) => o.trim().toLowerCase()).includes(a.trim().toLowerCase()))) {
+    return "Któraś z odpowiedzi musi być jedną z dostępnych opcji.";
   }
   return null;
 }
 
-const parseQuestion = (q) => ({ ...q, options: JSON.parse(q.options) });
+const parseQuestion = (q) => ({ ...q, answer: JSON.parse(q.answer), options: JSON.parse(q.options) });
 
 // ── Auth ──────────────────────────────────────────────────────
 router.get("/astrolab-admin/login", (req, res) => {
@@ -105,10 +105,10 @@ router.post("/astrolab-admin/api/questions", requireAdmin, (req, res) => {
   try {
     const info = db
       .prepare("INSERT INTO questions (code, question_text, answer, options, difficulty, time, file, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-      .run(code, question_text.trim(), answer.trim(), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", points || 1);
+      .run(code, question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", points || 1);
     res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(info.lastInsertRowid)));
   } catch {
-    res.status(500).json({ error: "Błąd bazy danych. Jakiś dureń źle zrobił coś i nie działa." });
+    res.status(500).json({ error: "Błąd bazy danych. Jakiś dureń źle zrobił coś i nie działa. Blame him, nie mnie!" });
   }
 });
 
@@ -124,7 +124,7 @@ router.put("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
   }
 
   db.prepare(`UPDATE questions SET question_text = ?, answer = ?, options = ?, difficulty = ?, time = ?, file = case when ? = '' then file else ? end, points = ? WHERE id = ?`)
-    .run(question_text.trim(), answer.trim(), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", fileUri || "", points || 1, id);
+    .run(question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", fileUri || "", points || 1, id);
 
   res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(id)));
 });

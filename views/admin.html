@@ -75,7 +75,7 @@ done_all
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Nick</th><th>Punkty</th></tr></thead>
+            <thead><tr><th>#</th><th>Nazwa użytkownika</th><th>Punkty</th></tr></thead>
             <tbody id="topBody"></tbody>
           </table>
         </div>
@@ -96,7 +96,7 @@ done_all
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>ID</th><th>Kod</th><th>URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedź</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
+              <tr><th>ID</th><th>Kod</th><th>Link URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedzi</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
             </thead>
             <tbody id="qBody"></tbody>
           </table>
@@ -119,7 +119,7 @@ done_all
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>#</th><th>Nick</th><th>Punkty</th><th>Odp.</th><th>Popr.</th><th>Data</th><th>Akcje</th></tr>
+              <tr><th>#</th><th>Nazwa użytkownika</th><th>Punkty</th><th>Udzielonych odpowiedzi</th><th>Poprawnych</th><th>Data zalogowania</th><th>Akcje</th></tr>
             </thead>
             <tbody id="pBody"></tbody>
           </table>
@@ -212,11 +212,18 @@ done_all
             <button class="add-opt" id="addOptBtn" type="button">＋ Dodaj opcję</button>
           </div>
           <div class="field">
-            <label>Poprawna odpowiedź *</label>
-            <select id="fAnswer"><option value="">— wybierz —</option></select>
+            <label>Poprawne odpowiedzi *</label>
+            <div id="fAnswers">
+              <select class="gAnswer"><option value="">— Wybierz odpowiedź —</option></select>
+            </div>
+            <div class="nextToNext">
+              <button type="button" id="addAnswer">Dodaj kolejną</button>
+              <button class="hidden" id="removeAnswer" type="button">Skasuj ostatnią od końca</button>
+            </div>
+            
           </div>
           <div class="field">
-            <label for="fDiff">Wybierz poziom trudności pytania*</label>
+            <label for="fDiff">Poziom trudności pytania*</label>
             <select name="fDiff" id="fDiff" >
               <option value="easy">Łatwy</option>
               <option value="medi" selected>Normalny</option>
@@ -225,7 +232,7 @@ done_all
           </div>
           <div class="field">
             <label for="fTime">Czas (w sekundach)*</label>
-            <input type="number" name="fTime" id="fTime" value="15" min="0" max="180">
+            <input type="number" name="fTime" id="fTime" value="15" min="5" max="360">
           </div>
           <div class="field">
             <label>Punkty</label>

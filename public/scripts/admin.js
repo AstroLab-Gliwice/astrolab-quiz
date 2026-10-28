@@ -140,6 +140,7 @@ function renderQuestions() {
     emptyRow("qBody", "Brak pytań. Dodaj pierwsze!");
     return;
   }
+
   tbody.innerHTML = questions.map((q) => `
           <tr>
             <td style="color:var(--muted);font-weight:700">${q.id}</td>
@@ -154,8 +155,8 @@ function renderQuestions() {
             </td>
             <td class="q-text">${esc(q.question_text)}</td>
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
-            <td class="q-answer">✓ ${esc(q.answer)}</td>
-            <td><a href="${esc(q.file)}">${esc(q.file)}</a></td>
+            <td class="q-answer">${q.answer.map((o) => esc(o)).join(", ")}</td>
+            <td><a href="${esc(q.file)}">Załącznik</a></td>
             <td>${esc(q.time)}</td>
             <td>${esc(q.difficulty)}</td>
             <td><span class="points-badge">${q.points} pkt</span></td>
@@ -212,7 +213,9 @@ function openEditQ(id) {
   document.querySelector("#fTime").value = q.time;
   document.getElementById("qErr").style.display = "none";
   buildOpts(q.options);
-  setTimeout(() => { document.getElementById("fAnswer").value = q.answer; }, 0);
+  setTimeout(() => { 
+    buildAnsw(q.answer);  
+  }, 0);
   document.getElementById("qModal").classList.add("open");
 }
 
@@ -225,13 +228,17 @@ document.getElementById("addOptBtn").onclick = () => addOpt("");
 
 document.getElementById("saveQBtn").onclick = async () => {
   const text = document.getElementById("fText").value.trim();
-  const answer = document.getElementById("fAnswer").value;
   const diff = document.querySelector("#fDiff").value;
   const time = parseInt(document.querySelector("#fTime").value) || 15;
   const options = getOptVals().filter((v) => v.trim());
   const points = parseInt(document.getElementById("fPoints").value) || 1;
   const errEl = document.getElementById("qErr");
   errEl.style.display = "none";
+  const answer = [];
+
+  document.querySelectorAll(".gAnswer").forEach(el => { // jest sroda, mam udar
+    answer.push(el.value);
+  });
 
   const file = document.querySelector("#fFile").files[0];
   let fileUri = "";
@@ -239,13 +246,13 @@ document.getElementById("saveQBtn").onclick = async () => {
   let checkUp = (!text || !answer || options.length < 2);
   if (checkUp) {
     if (!text) {
-      errEl.textContent = "Wypełnij treść, opcje i wybierz poprawną odpowiedź. [TEXT]";
+      errEl.textContent = "Wypełnij treść, opcje i wybierz poprawną odpowiedź. [Treść pytania]";
     }
     else if (!answer) {
-      errEl.textContent = "Wypełnij treść, opcje i wybierz poprawną odpowiedź. [ANSWERS]";
+      errEl.textContent = "Wypełnij treść, opcje i wybierz poprawną odpowiedź. [Kontent dostępnych odpowiedzi]";
     }
     else if (options.length < 2) {
-      errEl.textContent = "Wypełnij treść, opcje i wybierz poprawną odpowiedź. [OPTIONS < 2]";
+      errEl.textContent = "Wypełnij treść, opcje i wybierz poprawną odpowiedź. [Dostępne odpowiedzi < 2]";
     }
 
     errEl.style.display = "block";
@@ -289,6 +296,12 @@ function buildOpts(vals) {
   vals.forEach((v) => addOpt(v));
 }
 
+function buildAnsw(vals) {
+  document.getElementById("fAnswers").innerHTML = "";
+  vals.forEach((v) => addAnsw(v));
+}
+
+
 function addOpt(val) {
   const builder = document.getElementById("optsBuilder");
   if (builder.children.length >= 6) { toast("Maks. 6 opcji", "err"); return; }
@@ -323,12 +336,59 @@ function getOptVals() {
 }
 
 function syncAnswerSel() {
-  const sel = document.getElementById("fAnswer");
+  const sel = document.querySelectorAll(".gAnswer");
   const prev = sel.value;
   const vals = getOptVals().filter((v) => v.trim());
-  sel.innerHTML = '<option value="">— wybierz poprawną opcję —</option>'
+  sel.forEach(element => {
+    element.innerHTML = '<option value="">— Wybierz odpowiedź... —</option>'
     + vals.map((v) => `<option value="${esc(v)}"${v === prev ? " selected" : ""}>${esc(v)}</option>`).join("");
+  });
+  
 }
+
+function addAnsw(val) {
+  const answersDiv = document.querySelector("#fAnswers");
+  if (answersDiv.querySelectorAll("select.gAnswer").length < 4) {
+    const ddd = document.createElement("select");
+    const prev = val;
+    ddd.classList.add("gAnswer");
+    const vals = getOptVals().filter((v) => v.trim());
+    ddd.innerHTML = '<option value="">— Wybierz odpowiedź... —</option>'
+      + vals.map((v) => `<option value="${esc(v)}"${v === prev ? " selected" : ""}>${esc(v)}</option>`).join("");
+    answersDiv.appendChild(ddd);
+  }
+  if (document.querySelector("#removeAnswer").classList.contains('hidden')) {
+    document.querySelector("#removeAnswer").classList.remove('hidden');
+  }
+}
+
+document.querySelector("#addAnswer").addEventListener('click', () => {
+  const answersDiv = document.querySelector("#fAnswers");
+  if (answersDiv.querySelectorAll("select.gAnswer").length < 4) {
+    const ddd = document.createElement("select");
+    const prev = ddd.value;
+    ddd.classList.add("gAnswer");
+    const vals = getOptVals().filter((v) => v.trim());
+    ddd.innerHTML = '<option value="">— Wybierz odpowiedź... —</option>'
+      + vals.map((v) => `<option value="${esc(v)}"${v === prev ? " selected" : ""}>${esc(v)}</option>`).join("");
+    answersDiv.appendChild(ddd);
+  }
+  if (document.querySelector("#removeAnswer").classList.contains('hidden')) {
+    document.querySelector("#removeAnswer").classList.remove('hidden');
+  }
+});
+
+
+document.querySelector("#removeAnswer").addEventListener('click', () => {
+  const answersDiv = document.querySelector("#fAnswers");
+  if (answersDiv.querySelectorAll("select.gAnswer").length > 1) {
+    const answersDiv = document.querySelector("#fAnswers");
+    answersDiv.lastChild.remove();
+  }
+  if (answersDiv.querySelectorAll("select.gAnswer").length == 1) {
+    document.querySelector("#removeAnswer").classList.add('hidden');
+  }
+});
 
 // ── Players ───────────────────────────────────────────────
 let players = [];

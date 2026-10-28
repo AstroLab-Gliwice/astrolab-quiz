@@ -238,11 +238,15 @@ async function submitAnswer(answer) {
 function renderAlreadyAnswered() {
   mainEl.innerHTML = `
         <div class="info-card">
-          <div class="big-icon">⚠️</div>
-          <h1>Już tu byłeś!</h1>
+          <div class="big-icon">
+            <img src="https://media.tenor.com/sIvM0nE4GiIAAAAi/tkthao219-bubududu.gif" />
+          </div>
+          <h1>Już odpowiedziałeś na to pytanie.</h1>
           <p>Już próbowałeś odpowiedzieć na to pytanie.</p>
           <p style="margin-top:-10px">Skanuj kolejne kody QR!</p>
-          <a href="/" class="btn">← Wróć na stronę główną</a>
+          <a href="/" class="btn"><span class="material-symbols-outlined">
+arrow_back
+</span>Wróć na stronę główną</a>
         </div>`;
 }
 

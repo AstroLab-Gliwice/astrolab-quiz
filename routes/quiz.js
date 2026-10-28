@@ -105,8 +105,8 @@ router.post("/quiz/:id/answer", (req, res) => {
 
   const timedOut = !startRow || (Date.now() - startRow.started_at) / 1000 > question.time;
   const correct =
-    !timedOut &&
-    req.body.answer?.trim().toLowerCase() === question.answer.trim().toLowerCase();
+    !timedOut && JSON.parse(question.answer).some(a => a.trim().toLowerCase() == req.body.answer?.trim().toLowerCase());
+    //req.body.answer?.trim().toLowerCase() === question.answer.trim().toLowerCase();
 
   db.prepare("INSERT INTO answers (player_id, question_id, correct) VALUES (?, ?, ?)")
     .run(player.id, question.id, correct ? 1 : 0);

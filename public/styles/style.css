@@ -95,7 +95,7 @@ footer {
 
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn {
-  display: block;
+  display: flex;
   width: 100%;
   padding: 14px;
   border: none;
@@ -107,6 +107,8 @@ footer {
   cursor: pointer;
   text-decoration: none;
   text-align: center;
+  align-items: center;
+  justify-content: center;
   transition: background .2s;
 }
 
@@ -126,4 +128,28 @@ footer {
 
 input {
   border-radius: 100px !important;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border: 2px solid transparent;
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb {
+  transition: 0.2s all;
+  filter: brightness(1);
+  background: var(--accent);
+  border-radius: 100px;
+  margin: 2px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(0.5);
+  background-clip: padding-box;
 }
