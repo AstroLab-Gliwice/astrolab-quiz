@@ -239,7 +239,7 @@ function renderAlreadyAnswered() {
   mainEl.innerHTML = `
         <div class="info-card">
           <div class="big-icon">
-            <img src="https://media.tenor.com/sIvM0nE4GiIAAAAi/tkthao219-bubududu.gif" />
+            <img src="/img/bubududu.gif" />
           </div>
           <h1>Już odpowiedziałeś na to pytanie.</h1>
           <p>Już próbowałeś odpowiedzieć na to pytanie.</p>
