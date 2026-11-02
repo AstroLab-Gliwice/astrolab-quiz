@@ -223,11 +223,11 @@ warning
                               <div style="font-weight:600;font-size:14px">Importuj bazę danych <span class="material-symbols-outlined ultra-small">
             warning
             </span></div>
-                              <div style="font-size:13px;color:var(--muted);margin-top:2px">Importuj swoją kopię bazy danych z pliku .db, całkowicie zastępując całą dotychczasową bazę pytań. <i class="ultra-ultra-small red">[OPERACJA DESTRUKTYWNA. NIEPRAWIDŁOWE PLIKI MOGĄ ZEPSUĆ PAMIĘĆ.]</i></div>
+                              <div style="font-size:13px;color:var(--muted);margin-top:2px">Importuj swoją kopię bazy danych z pliku .db, całkowicie zastępując całą dotychczasową bazę pytań. <i class="ultra-ultra-small red">[OPERACJA DESTRUKCYJNA! NIEPRAWIDŁOWE PLIKI MOGĄ ZEPSUĆ PAMIĘĆ.]</i></div>
                             </div>
                             <div>
-                              <input type="file" name="dbFile" id="dbFile" >
-                              <button id="import-db">Importuj...</button>
+                              <input type="file" name="dbFile" id="dbFile" accept=".db">
+                              <button id="import-db" class="btn btn-sm">Importuj...</button>
                             </div>
                           </div>
                         </div>
@@ -237,7 +237,7 @@ warning
                               <div style="font-weight:600;font-size:14px">Eksportuj bazę danych</div>
                               <div style="font-size:13px;color:var(--muted);margin-top:2px">Skopiuj bazę danych do pliku .db w standardzie SQLite.</div>
                             </div>
-                            <button id="export-db">Eksportuj...</button>
+                            <button id="export-db" class="btn btn-sm">Eksportuj...</button>
                           </div>
                         </div>
             </div>
@@ -293,7 +293,7 @@ warning
           </div>
           <div class="field">
             <label for="fFile">Załącznik (obraz, wideo, dźwięk)</label>
-            <input type="file" name="fFile" id="fFile">
+            <input type="file" name="fFile" id="fFile"  accept=".png, .jpg, .jpeg, .gif, .webp, .svg, .mp4, .webm, .mov, .mkv, .avi, .mp3, .wav, .ogg, .m4a, .flac">
           </div>
           <div class="field">
             <label>Opcje odpowiedzi *</label>

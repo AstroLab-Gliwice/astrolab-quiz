@@ -485,6 +485,16 @@ document.querySelector("#import-db").addEventListener('click', async () => {
   const imData = new FormData();
   imData.append("dbFile", document.querySelector('#dbFile').files[0]);
 
+  if (document.querySelector('#dbFile').files[0] == null) {
+     toast(`Błąd ładowania bazy danych: nie wybrano pliku`, "err");
+     return;
+  }
+
+  if (document.querySelector('#dbFile').files[0].name.match(/\.([^.]+)$/)?.[1]?.toLowerCase() != "db") {
+    toast(`Błąd ładowania bazy danych: plik nie jest w formacie .db`, "err");
+    return;
+  }
+
   try {
     const response = await fetch("/astrolab-admin/api/importing_database", {
       method: 'POST',
