@@ -13,7 +13,7 @@ function emptyRow(tbodyId, text) {
 
 function toast(msg, type = "ok") {
   const el = document.getElementById("toast");
-  el.textContent = (type === "err" ? "❌ " : "✅ ") + msg;
+  el.innerHTML = (type === "err" ? '<span class="material-symbols-outlined ultra-small">close</span> ' : '<span class="material-symbols-outlined ultra-small">check</span> ') + msg;
   el.className = `toast show ${type}`;
   clearTimeout(el._t);
   el._t = setTimeout(() => { el.className = "toast"; }, 3000);
