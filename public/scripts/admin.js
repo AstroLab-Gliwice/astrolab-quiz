@@ -137,7 +137,7 @@ async function loadQuestions() {
 function renderQuestions() {
   const tbody = document.getElementById("qBody");
   if (!questions.length) {
-    emptyRow("qBody", "Brak pytań. Dodaj pierwsze!");
+    emptyRow("qBody", 'Brak pytań. Kliknij "Nowe pytanie", aby dodać pytanie.');
     return;
   }
 
@@ -145,6 +145,7 @@ function renderQuestions() {
           <tr>
             <td style="color:var(--muted);font-weight:700">${q.id}</td>
             <td><span class="code-badge">${esc(q.code)}</span></td>
+            <td>${esc(q.type)}</td>
             <td>
               <span class="url-cell">/quiz/${esc(q.code)}</span>
               <button class="copy-url" onclick="copyUrl('${location.origin}/quiz/${esc(q.code)}')">
@@ -157,7 +158,7 @@ function renderQuestions() {
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
             <td class="q-answer">${q.answer.map((o) => esc(o)).join(", ")}</td>
             <td><a href="${esc(q.file)}">Załącznik</a></td>
-            <td>${esc(q.time)}</td>
+            <td>${esc(q.time)}s</td>
             <td>${esc(q.difficulty)}</td>
             <td><span class="points-badge">${q.points} pkt</span></td>
             <td>
@@ -194,6 +195,7 @@ let editingQId = null;
 function openAddQ() {
   editingQId = null;
   document.getElementById("qModalTitle").textContent = "Nowe pytanie";
+  document.querySelector("#fType").value = "one";
   document.querySelector("#fFile").value = "";
   document.getElementById("fText").value = "";
   document.getElementById("fPoints").value = 1;
@@ -207,6 +209,7 @@ function openEditQ(id) {
   if (!q) return;
   editingQId = id;
   document.getElementById("qModalTitle").textContent = `Edytuj pytanie #${id}`;
+  document.querySelector("#fType").value = q.type;
   document.getElementById("fText").value = q.question_text;
   document.getElementById("fPoints").value = q.points;
   document.querySelector("#fDiff").value = q.difficulty;
@@ -227,6 +230,7 @@ document.getElementById("addQBtn").onclick = openAddQ;
 document.getElementById("addOptBtn").onclick = () => addOpt("");
 
 document.getElementById("saveQBtn").onclick = async () => {
+  const type = document.querySelector("#fType").value;
   const text = document.getElementById("fText").value.trim();
   const diff = document.querySelector("#fDiff").value;
   const time = parseInt(document.querySelector("#fTime").value) || 15;
@@ -278,7 +282,7 @@ document.getElementById("saveQBtn").onclick = async () => {
     console.log(fileUri);
   }
 
-  const { ok, data } = await api(url, { method, body: JSON.stringify({ question_text: text, answer, options, diff, time, fileUri, points }) });
+  const { ok, data } = await api(url, { method, body: JSON.stringify({ type, question_text: text, answer, options, diff, time, fileUri, points }) });
 
 
   if (!ok) { errEl.textContent = data.error || "Błąd zapisu."; errEl.style.display = "block"; return; }
@@ -304,7 +308,7 @@ function buildAnsw(vals) {
 
 function addOpt(val) {
   const builder = document.getElementById("optsBuilder");
-  if (builder.children.length >= 6) { toast("Maks. 6 opcji", "err"); return; }
+  if (builder.children.length >= 6) { toast("Maksymalnie 6 opcji", "err"); return; }
 
   const row = document.createElement("div");
   row.className = "opt-row";
@@ -314,7 +318,7 @@ function addOpt(val) {
 
   const btn = Object.assign(document.createElement("button"), { className: "opt-remove", textContent: "−", type: "button" });
   btn.onclick = () => {
-    if (builder.children.length <= 2) { toast("Min. 2 opcje", "err"); return; }
+    if (builder.children.length <= 2) { toast("Minimum 2 opcje", "err"); return; }
     row.remove();
     relabelOpts();
     syncAnswerSel();
@@ -568,7 +572,12 @@ function downloadPng(canvas, suffix = "") {
   link.click();
 }
 
+
 document.getElementById("qrDownloadBtn").onclick = () => downloadPng(document.getElementById("qrCanvas"));
+
+document.getElementById("qrPrintBtn").addEventListener("click", () => {
+  window.print();
+});
 
 document.getElementById("qrDownloadTransparentBtn").onclick = () => {
   const { src, id, label } = _qrParts;

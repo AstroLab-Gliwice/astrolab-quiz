@@ -33,7 +33,7 @@ router.get("/quiz/api/:id", (req, res) => {
   if (!player) return res.status(401).json({ error: "Wymagana rejestracja." });
 
   const question = db
-    .prepare("SELECT id, question_text, options, difficulty, time, file, points FROM questions WHERE code = ?")
+    .prepare("SELECT id, type, question_text, options, difficulty, time, file, points FROM questions WHERE code = ?")
     .get(req.params.id);
   if (!question) return res.status(404).json({ error: "Nie ma takiego pytania." });
 
@@ -48,6 +48,7 @@ router.get("/quiz/api/:id", (req, res) => {
   res.json({
     question: {
       id: question.id,
+      qType: question.type,
       text: question.question_text,
       options: JSON.parse(question.options),
       difficulty: question.difficulty,
@@ -104,8 +105,15 @@ router.post("/quiz/:id/answer", (req, res) => {
     .get(player.id, question.id);
 
   const timedOut = !startRow || (Date.now() - startRow.started_at) / 1000 > question.time;
-  const correct =
-    !timedOut && JSON.parse(question.answer).some(a => a.trim().toLowerCase() == req.body.answer?.trim().toLowerCase());
+  let correct = "";
+  if (req.body.type == "one") {
+    correct = !timedOut && JSON.parse(question.answer).some(a => a.trim().toLowerCase() == req.body.answer?.trim().toLowerCase());
+  }
+  else {
+    correct = !timedOut && req.body.answer.map(a => a.trim().toLowerCase()).sort().length == [...JSON.parse(question.answer).map(a => a.trim().toLowerCase())].sort().length 
+      && req.body.answer.map(a => a.trim().toLowerCase()).sort().every((answer, index) => answer == [...JSON.parse(question.answer).map(a => a.trim().toLowerCase())].sort()[index]);
+  }
+    
     //req.body.answer?.trim().toLowerCase() === question.answer.trim().toLowerCase();
 
   db.prepare("INSERT INTO answers (player_id, question_id, correct) VALUES (?, ?, ?)")

@@ -16,6 +16,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS questions (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     code          TEXT NOT NULL UNIQUE,
+    type text not null,
     question_text TEXT NOT NULL,
     answer        TEXT NOT NULL,
     file text default "",

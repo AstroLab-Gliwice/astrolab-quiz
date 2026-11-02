@@ -96,7 +96,7 @@ done_all
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>ID</th><th>Kod</th><th>Link URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedzi</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
+              <tr><th>ID</th><th>Kod</th><th>Typ</th><th>Link URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedzi</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
             </thead>
             <tbody id="qBody"></tbody>
           </table>
@@ -199,6 +199,13 @@ done_all
         <div class="modal-body">
           <div class="modal-err" id="qErr"></div>
           <div class="field">
+            <label for="">Typ pytania</label>
+            <select name="fType" id="fType">
+              <option value="one">Pytanie jednokrotnego wyboru</option>
+              <option value="many">Pytanie wielokrotnego wyboru</option>
+            </select>
+          </div>
+          <div class="field">
             <label>Treść pytania *</label>
             <textarea id="fText" placeholder="Wpisz treść..."></textarea>
           </div>
@@ -264,6 +271,9 @@ download
               <button class="btn btn-qr" id="qrDownloadTransparentBtn"><span class="material-symbols-outlined">
 download
 </span> Bez tła</button>
+                <button class="btn btn-qr" id="qrPrintBtn"><span class="material-symbols-outlined">
+print
+</span> Drukuj</button>
             </div>
           </div>
         </div>

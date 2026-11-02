@@ -97,15 +97,15 @@ router.get("/astrolab-admin/api/questions", requireAdmin, (_req, res) => {
 });
 
 router.post("/astrolab-admin/api/questions", requireAdmin, (req, res) => {
-  const { question_text, answer, options, diff, time, fileUri, points } = req.body;
+  const { type, question_text, answer, options, diff, time, fileUri, points } = req.body;
   const err = validateQuestion({ question_text, answer, options });
   if (err) return res.status(400).json({ error: err });
 
   const code = randomBytes(3).toString("hex").toUpperCase().slice(0, 4);
   try {
     const info = db
-      .prepare("INSERT INTO questions (code, question_text, answer, options, difficulty, time, file, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-      .run(code, question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", points || 1);
+      .prepare("INSERT INTO questions (code, type, question_text, answer, options, difficulty, time, file, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+      .run(code, type, question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", points || 1);
     res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(info.lastInsertRowid)));
   } catch {
     res.status(500).json({ error: "Błąd bazy danych. Jakiś dureń źle zrobił coś i nie działa. Blame him, nie mnie!" });
@@ -113,7 +113,7 @@ router.post("/astrolab-admin/api/questions", requireAdmin, (req, res) => {
 });
 
 router.put("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
-  const { question_text, answer, options, diff, time, fileUri, points } = req.body;
+  const { type, question_text, answer, options, diff, time, fileUri, points } = req.body;
   const { id } = req.params;
 
   const err = validateQuestion({ question_text, answer, options });
@@ -123,8 +123,8 @@ router.put("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
     return res.status(404).json({ error: "Nie znaleziono pytania." });
   }
 
-  db.prepare(`UPDATE questions SET question_text = ?, answer = ?, options = ?, difficulty = ?, time = ?, file = case when ? = '' then file else ? end, points = ? WHERE id = ?`)
-    .run(question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", fileUri || "", points || 1, id);
+  db.prepare(`UPDATE questions SET type = ?, question_text = ?, answer = ?, options = ?, difficulty = ?, time = ?, file = case when ? = '' then file else ? end, points = ? WHERE id = ?`)
+    .run(type, question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", fileUri || "", points || 1, id);
 
   res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(id)));
 });

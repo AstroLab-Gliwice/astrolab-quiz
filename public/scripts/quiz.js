@@ -34,9 +34,9 @@ async function loadQuestion() {
     if (data.startedAt) {
       const elapsed = (Date.now() - clockOffset - data.startedAt) / 1000;
       if (elapsed >= data.timelimit) {
-        submitAnswer("__TIMEOUT__");
+        submitAnswer("__TIMEOUT__", "one");
       } else {
-        renderQuestion({ question: data.question, player: data.player, timelimit: data.timelimit, difficulty: data.question.difficulty, file: data.question.file, startedAt: data.startedAt, clockOffset });
+        renderQuestion({ qType: data.question.qType, question: data.question, player: data.player, timelimit: data.timelimit, difficulty: data.question.difficulty, file: data.question.file, startedAt: data.startedAt, clockOffset });
       }
     } else {
       renderStart({ ...data, clockOffset });
@@ -74,23 +74,28 @@ function renderStart({ question, player, timelimit, clockOffset = 0 }) {
       if (res.status === 409) { location.reload(); return; }
       if (!res.ok) { btn.disabled = false; btn.textContent = "Rozpocznij ▶"; return; }
 
-      renderQuestion({ question, player, timelimit, difficulty: question.difficulty, file: question.file, startedAt: data.startedAt, clockOffset: startClockOffset });
+      renderQuestion({ qType: question.qType, question, player, timelimit, difficulty: question.difficulty, file: question.file, startedAt: data.startedAt, clockOffset: startClockOffset });
     } catch {
       btn.disabled = false;
-      btn.textContent = "Rozpocznij ▶";
+      btn.textContent = "...";
       alert("Błąd połączenia. Spróbuj ponownie.");
     }
   });
 }
 
 // ── Question screen ───────────────────────────────────────
-function renderQuestion({ question, player, timelimit, difficulty, file, startedAt, clockOffset = 0 }) {
+function renderQuestion({ qType, question, player, timelimit, difficulty, file, startedAt, clockOffset = 0 }) {
   let diffText = "";
   let type = "";
+  let quType = "";
   switch (difficulty) {
     case ("easy"): diffText = "Łatwy"; break;
     case ("medi"): diffText = "Normalny"; break;
     case ("hard"): diffText = "Wymagający"; break;
+  }
+  switch (qType) {
+    case ("one"): quType = "Pytanie jednokrotnego wyboru"; break;
+    case ("many"): quType = "Pytanie wielokrotnego wyboru"; break;
   }
   const extension = file.split(".").pop().toLowerCase();
   if (["png", "jpg", "jpeg", "gif", "webp", "svg"].includes(extension)) {
@@ -103,7 +108,7 @@ function renderQuestion({ question, player, timelimit, difficulty, file, started
     type = `<audio class="fit" controls src="${file}" controlsList="nodownload"></audio>`;
   }
   else {
-    type = `<div style="display='none'"/>`;
+    type = ``;
   }
   mainEl.innerHTML = `
         <div class="panel quiz-card">
@@ -113,8 +118,11 @@ function renderQuestion({ question, player, timelimit, difficulty, file, started
               <span class="question-number">Pytanie #${question.id}</span>
             </div>
             <div class="row">
-                 <div class="question-text">${esc(question.text)}</div>
-                <div class="difficulty-wrap ${difficulty}"><span>${diffText}</span></div>
+                <div class="question-text">${esc(question.text)}</div>
+                <div class="column right">
+                  <div class="difficulty-wrap ${difficulty}"><span>${diffText}</span></div>
+                  <span class="question-type">${quType}</span>
+                </div>
             </div>
             ${type}
           </div>
@@ -133,24 +141,49 @@ function renderQuestion({ question, player, timelimit, difficulty, file, started
           <button class="submit-btn" id="submitBtn" disabled>Zatwierdź odpowiedź</button>
         </div>`;
 
-  let selectedAnswer = null;
+  let selectedAnswer;
+  if (qType == "one") {
+    selectedAnswer = null;
+  }
+  else {
+    selectedAnswer = [];
+  }
   const answersEl = document.getElementById("answers");
   const submitBtn = document.getElementById("submitBtn");
   const timerFill = document.getElementById("timerFill");
   const timerLabel = document.getElementById("timerLabel");
 
-  answersEl.addEventListener("click", (e) => {
-    const el = e.target.closest(".answer");
-    if (!el || el.classList.contains("disabled")) return;
-    answersEl.querySelectorAll(".answer").forEach((a) => a.classList.remove("selected"));
-    el.classList.add("selected");
-    selectedAnswer = el.textContent.trim();
-    submitBtn.classList.add("active");
-    submitBtn.disabled = false;
-  });
+  if (qType == "one") {
+    answersEl.addEventListener("click", (e) => {
+      const el = e.target.closest(".answer");
+      if (!el || el.classList.contains("disabled")) return;
+      answersEl.querySelectorAll(".answer").forEach((a) => a.classList.remove("selected"));
+      el.classList.add("selected");
+      selectedAnswer = el.textContent.trim();
+      submitBtn.classList.add("active");
+      submitBtn.disabled = false;
+    });
+  }
+  else {
+    answersEl.addEventListener("click", (e) => {
+      const el = e.target.closest(".answer");
+      //if (!el || el.classList.contains("disabled")) return;
+      if (el.classList.contains("selected")) {
+        el.classList.remove("selected");
+        selectedAnswer = selectedAnswer.filter(text => text != el.textContent.trim());
+      }
+      else {
+        el.classList.add("selected");
+        selectedAnswer.push(el.textContent.trim());
+        submitBtn.classList.add("active");
+        submitBtn.disabled = false;
+      }
+    });
+  }
+  
 
   submitBtn.addEventListener("click", () => {
-    if (selectedAnswer) submitAnswer(selectedAnswer);
+    if (selectedAnswer) submitAnswer(selectedAnswer, qType);
   });
 
   // ── Timer (rAF — smooth, server-based) ───────────────────
@@ -186,7 +219,7 @@ function renderQuestion({ question, player, timelimit, difficulty, file, started
         submitBtn.disabled = true;
         submitBtn.classList.remove("active");
         submitBtn.textContent = "⏰ Zapisywanie...";
-        submitAnswer("__TIMEOUT__");
+        submitAnswer("__TIMEOUT__", "one");
       }
       return;
     }
@@ -198,7 +231,7 @@ function renderQuestion({ question, player, timelimit, difficulty, file, started
 }
 
 // ── Submit ────────────────────────────────────────────────
-async function submitAnswer(answer) {
+async function submitAnswer(answer, type) {
   const isTimeout = answer === "__TIMEOUT__";
   const submitBtn = document.getElementById("submitBtn");
   if (submitBtn) {
@@ -210,7 +243,7 @@ async function submitAnswer(answer) {
     const res = await fetch(`/quiz/${questionId}/answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answer }),
+      body: JSON.stringify({ answer, type }),
     });
     const data = await res.json();
 
