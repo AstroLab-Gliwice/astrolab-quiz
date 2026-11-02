@@ -134,6 +134,8 @@ body {
 
 /* ── Main content ────────────────────────────────────────── */
 .main {
+  display: flex;
+  flex-direction: column;
   margin-left: var(--sw);
   flex: 1;
   padding: 32px;
@@ -1092,6 +1094,10 @@ td {
   font-size: 14px;
 }
 
+.ultra-ultra-small {
+  font-size: 9px;
+}
+
 .collapsed {
   display: none;
   height: 0;
@@ -1103,4 +1109,32 @@ td {
 
 input[type="file"] {
   cursor:copy;
+}
+
+footer, footer a {
+  margin-top: auto;
+  align-self: flex-end;
+  font-size: 10px;
+  color: gray !important;
+  text-decoration: none;
+}
+
+.red {
+  color: red;
+}
+
+.a-small-sur {
+  text-align: center;
+  font-size: 10px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, .65);
+  background-color: transparent;
+  text-decoration: none;
+  padding: 6px 4px;
+  border-radius: 100px;
+}
+
+.a-small-sur:hover {
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
 }

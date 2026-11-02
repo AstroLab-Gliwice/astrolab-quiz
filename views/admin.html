@@ -27,7 +27,7 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <aside class="sidebar" id="sidebar">
-    <a href="/" style="text-decoration:none;" class="sb-logo">
+    <a style="text-decoration:none;" class="sb-logo">
       <img src="/logo/astrolab-main.svg" alt="" />
       <div class="sb-logo-text">
         <span>AstroLab Quiz</span>
@@ -45,6 +45,7 @@
     <button class="logout-btn" id="logoutBtn" style="justify-content:center;margin-top:8px"><span class="material-symbols-outlined">
 logout
 </span>Wyloguj się</button>
+    <a class="ultra-ultra-small red a-small-sur" href="/"> Przekieruj na stronę główną</a>
   </aside>
 
   <main class="main">
@@ -222,7 +223,7 @@ warning
                               <div style="font-weight:600;font-size:14px">Importuj bazę danych <span class="material-symbols-outlined ultra-small">
             warning
             </span></div>
-                              <div style="font-size:13px;color:var(--muted);margin-top:2px"><i>[OPERACJA DESTRUKTYWNA] </i>Importuj swoją kopię zestawu pytań z pliku, całkowicie zastępując całą dotychczasową bazę pytań.</div>
+                              <div style="font-size:13px;color:var(--muted);margin-top:2px">Importuj swoją kopię bazy danych z pliku .db, całkowicie zastępując całą dotychczasową bazę pytań. <i class="ultra-ultra-small red">[OPERACJA DESTRUKTYWNA. NIEPRAWIDŁOWE PLIKI MOGĄ ZEPSUĆ PAMIĘĆ.]</i></div>
                             </div>
                             <div>
                               <input type="file" name="dbFile" id="dbFile" >
@@ -233,8 +234,8 @@ warning
                         <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
                             <div>
-                              <div style="font-weight:600;font-size:14px">Eksportuj bazę pytań</div>
-                              <div style="font-size:13px;color:var(--muted);margin-top:2px">Wyeksportuj swoją kopię zestawu pytań do pliku.</div>
+                              <div style="font-weight:600;font-size:14px">Eksportuj bazę danych</div>
+                              <div style="font-size:13px;color:var(--muted);margin-top:2px">Skopiuj bazę danych do pliku .db w standardzie SQLite.</div>
                             </div>
                             <button id="export-db">Eksportuj...</button>
                           </div>
@@ -391,6 +392,9 @@ person_edit
     <div class="toast" id="toast"></div>
 
     <script src="/scripts/admin.js"></script>
+    <footer>
+      <p>&copy; 2026 <a href="https://github.com/AstroLab-Gliwice">AstroLab</a> Gliwi<a href="https://github.com/kwymyslo">c</a><a href="https://github.com/i5cmd">e</a></p>
+    </footer>
 </main>
 </body>
 </html>
