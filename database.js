@@ -3,7 +3,7 @@ const fs = require("fs");
 
 fs.mkdirSync("./data", { recursive: true });
 
-const db = new DatabaseSync("./data/baza.db");
+let db = new DatabaseSync("./data/baza.db");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS players (
@@ -50,4 +50,11 @@ db.exec(`
   INSERT OR IGNORE INTO settings (key, value) VALUES ('quiz_timelimit', '60');
 `);
 
-module.exports = db;
+function restartDb() {
+  db = new DatabaseSync("./data/baza.db")
+}
+
+module.exports = {
+  getDb: () => db,
+  restartDb
+};

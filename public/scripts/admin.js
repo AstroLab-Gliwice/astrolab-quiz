@@ -477,6 +477,26 @@ function applyToggleStatus(cfg, enabled) {
   document.getElementById(cfg.statusId).textContent = enabled ? cfg.on : cfg.off;
 }
 
+document.querySelector("#export-db").addEventListener('click', () => {
+  window.location.href = '/astrolab-admin/api/exporting_database';
+})
+
+document.querySelector("#import-db").addEventListener('click', async () => {
+  const imData = new FormData();
+  imData.append("dbFile", document.querySelector('#dbFile').files[0]);
+
+  try {
+    const response = await fetch("/astrolab-admin/api/importing_database", {
+      method: 'POST',
+      body: imData
+    });
+    toast(editingQId ? "Importowanie zakończone!" : "Wczytano bazę danych!");
+  } catch (error) {
+    console.error(error);
+    toast(`Błąd ładowania bazy danych: ${error}`, "err");
+  }
+})
+
 function makeToggleHandler(apiPath, cfg) {
   return async function () {
     try {
@@ -544,6 +564,15 @@ async function loadSettings() {
     toast("Błąd zapisu ustawień.", "err"); aj tam gadasz...
   }
 }; */
+
+document.querySelector("#db-header").addEventListener('click', () => {
+  if (document.querySelector("#db-content").classList.contains("collapsed")) {
+    document.querySelector("#db-content").classList.remove("collapsed");
+  }
+  else {
+    document.querySelector("#db-content").classList.add("collapsed");
+  }
+});
 
 // ── QR Code ───────────────────────────────────────────────
 let _currentQrUrl = "";
@@ -703,6 +732,8 @@ backdrop.addEventListener("click", closeSidebar);
 document.querySelectorAll(".nav-btn").forEach((btn) => {
   btn.addEventListener("click", () => { if (window.innerWidth <= 768) closeSidebar(); });
 });
+
+
 
 // ── Init ──────────────────────────────────────────────────
 loadDashboard();

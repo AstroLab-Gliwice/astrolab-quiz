@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { join } = require("path");
-const db = require("../database");
+const dbM = require("../database");
+const db = () => dbM.getDb();
 const { getTimelimit } = require("./settings");
 
 const router = Router();
@@ -9,11 +10,11 @@ const VIEWS = join(__dirname, "..", "views");
 const getPlayer = (req) => {
   const { player_id } = req.cookies;
   if (!player_id) return null;
-  return db.prepare("SELECT id, nick, score FROM players WHERE id = ?").get(player_id);
+  return db().prepare("SELECT id, nick, score FROM players WHERE id = ?").get(player_id);
 };
 
 const getQuestion = (code) =>
-  db.prepare("SELECT id FROM questions WHERE code = ?").get(code);
+  db().prepare("SELECT id FROM questions WHERE code = ?").get(code);
 
 // ── Pages ─────────────────────────────────────────────────────
 router.get("/quiz/:id", (req, res) => {
@@ -32,16 +33,16 @@ router.get("/quiz/api/:id", (req, res) => {
   const player = getPlayer(req);
   if (!player) return res.status(401).json({ error: "Wymagana rejestracja." });
 
-  const question = db
+  const question = db()
     .prepare("SELECT id, type, question_text, options, difficulty, time, file, points FROM questions WHERE code = ?")
     .get(req.params.id);
   if (!question) return res.status(404).json({ error: "Nie ma takiego pytania." });
 
-  const attempt = db
+  const attempt = db()
     .prepare("SELECT correct FROM answers WHERE player_id = ? AND question_id = ?")
     .get(player.id, question.id);
 
-  const startRow = db
+  const startRow = db()
     .prepare("SELECT started_at FROM question_starts WHERE player_id = ? AND question_id = ?")
     .get(player.id, question.id);
 
@@ -72,14 +73,14 @@ router.post("/quiz/:id/start", (req, res) => {
   const question = getQuestion(req.params.id);
   if (!question) return res.status(404).json({ error: "Nie ma takiego pytania." });
 
-  if (db.prepare("SELECT 1 FROM answers WHERE player_id = ? AND question_id = ?").get(player.id, question.id)) {
+  if (db().prepare("SELECT 1 FROM answers WHERE player_id = ? AND question_id = ?").get(player.id, question.id)) {
     return res.status(409).json({ error: "Już odpowiedziałeś na to pytanie." });
   }
 
-  db.prepare("INSERT OR IGNORE INTO question_starts (player_id, question_id, started_at) VALUES (?, ?, ?)")
+  db().prepare("INSERT OR IGNORE INTO question_starts (player_id, question_id, started_at) VALUES (?, ?, ?)")
     .run(player.id, question.id, Date.now());
 
-  const row = db
+  const row = db()
     .prepare("SELECT started_at FROM question_starts WHERE player_id = ? AND question_id = ?")
     .get(player.id, question.id);
 
@@ -91,16 +92,16 @@ router.post("/quiz/:id/answer", (req, res) => {
   const player = getPlayer(req);
   if (!player) return res.status(401).json({ error: "Wymagana rejestracja." });
 
-  const question = db
+  const question = db()
     .prepare("SELECT id, answer, difficulty, time, points FROM questions WHERE code = ?")
     .get(req.params.id);
   if (!question) return res.status(404).json({ error: "Nie ma takiego pytania." });
 
-  if (db.prepare("SELECT 1 FROM answers WHERE player_id = ? AND question_id = ?").get(player.id, question.id)) {
+  if (db().prepare("SELECT 1 FROM answers WHERE player_id = ? AND question_id = ?").get(player.id, question.id)) {
     return res.status(409).json({ error: "Już odpowiedziałeś na to pytanie." });
   }
 
-  const startRow = db
+  const startRow = db()
     .prepare("SELECT started_at FROM question_starts WHERE player_id = ? AND question_id = ?")
     .get(player.id, question.id);
 
@@ -116,14 +117,14 @@ router.post("/quiz/:id/answer", (req, res) => {
     
     //req.body.answer?.trim().toLowerCase() === question.answer.trim().toLowerCase();
 
-  db.prepare("INSERT INTO answers (player_id, question_id, correct) VALUES (?, ?, ?)")
+  db().prepare("INSERT INTO answers (player_id, question_id, correct) VALUES (?, ?, ?)")
     .run(player.id, question.id, correct ? 1 : 0);
 
   if (correct) {
-    db.prepare("UPDATE players SET score = score + ? WHERE id = ?").run(question.points, player.id);
+    db().prepare("UPDATE players SET score = score + ? WHERE id = ?").run(question.points, player.id);
   }
 
-  const { score: newScore } = db.prepare("SELECT score FROM players WHERE id = ?").get(player.id);
+  const { score: newScore } = db().prepare("SELECT score FROM players WHERE id = ?").get(player.id);
 
   res.json({
     correct,

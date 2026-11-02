@@ -1,10 +1,11 @@
-const db = require("../database");
+const dbM = require("../database");
+const db = () => dbM.getDb();
 
 const getSetting = (key) =>
-  db.prepare("SELECT value FROM settings WHERE key = ?").get(key)?.value;
+  db().prepare("SELECT value FROM settings WHERE key = ?").get(key)?.value;
 
 const setSetting = (key, val) =>
-  db.prepare("UPDATE settings SET value = ? WHERE key = ?").run(val, key);
+  db().prepare("UPDATE settings SET value = ? WHERE key = ?").run(val, key);
 
 // ── Leaderboard ───────────────────────────────────────────────
 const isLeaderboardEnabled = () => getSetting("leaderboard_enabled") === "1";
@@ -22,7 +23,7 @@ const getTimelimit = () => {
 
 const setTimelimit = (v) => {
   const val = Math.max(5, Math.min(600, parseInt(v) || 60));
-  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('quiz_timelimit', ?)").run(String(val));
+  db().prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('quiz_timelimit', ?)").run(String(val));
   return val;
 };
 

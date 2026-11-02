@@ -2,7 +2,8 @@ const { Router } = require("express");
 const { randomBytes } = require("crypto");
 const bcrypt = require("bcryptjs");
 const rateLimit = require("express-rate-limit");
-const db = require("../database");
+const dbM = require("../database");
+const db = () => dbM.getDb();
 const multer = require("multer");
 const path = require("path");
 const { join } = path;
@@ -84,16 +85,16 @@ router.get("/astrolab-admin", requireAdmin, (_req, res) => {
 // ── Stats ─────────────────────────────────────────────────────
 router.get("/astrolab-admin/api/stats", requireAdmin, (_req, res) => {
   res.json({
-    players:   db.prepare("SELECT COUNT(*) AS c FROM players").get().c,
-    questions: db.prepare("SELECT COUNT(*) AS c FROM questions").get().c,
-    answers:   db.prepare("SELECT COUNT(*) AS c FROM answers").get().c,
-    correct:   db.prepare("SELECT COUNT(*) AS c FROM answers WHERE correct = 1").get().c,
+    players:   db().prepare("SELECT COUNT(*) AS c FROM players").get().c,
+    questions: db().prepare("SELECT COUNT(*) AS c FROM questions").get().c,
+    answers:   db().prepare("SELECT COUNT(*) AS c FROM answers").get().c,
+    correct:   db().prepare("SELECT COUNT(*) AS c FROM answers WHERE correct = 1").get().c,
   });
 });
 
 // ── Questions ─────────────────────────────────────────────────
 router.get("/astrolab-admin/api/questions", requireAdmin, (_req, res) => {
-  res.json(db.prepare("SELECT * FROM questions ORDER BY id ASC").all().map(parseQuestion));
+  res.json(db().prepare("SELECT * FROM questions ORDER BY id ASC").all().map(parseQuestion));
 });
 
 router.post("/astrolab-admin/api/questions", requireAdmin, (req, res) => {
@@ -103,10 +104,10 @@ router.post("/astrolab-admin/api/questions", requireAdmin, (req, res) => {
 
   const code = randomBytes(3).toString("hex").toUpperCase().slice(0, 4);
   try {
-    const info = db
+    const info = db()
       .prepare("INSERT INTO questions (code, type, question_text, answer, options, difficulty, time, file, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
       .run(code, type, question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", points || 1);
-    res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(info.lastInsertRowid)));
+    res.json(parseQuestion(db().prepare("SELECT * FROM questions WHERE id = ?").get(info.lastInsertRowid)));
   } catch {
     res.status(500).json({ error: "Błąd bazy danych. Jakiś dureń źle zrobił coś i nie działa. Blame him, nie mnie!" });
   }
@@ -119,23 +120,23 @@ router.put("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
   const err = validateQuestion({ question_text, answer, options });
   if (err) return res.status(400).json({ error: err });
 
-  if (!db.prepare("SELECT id FROM questions WHERE id = ?").get(id)) {
+  if (!db().prepare("SELECT id FROM questions WHERE id = ?").get(id)) {
     return res.status(404).json({ error: "Nie znaleziono pytania." });
   }
 
-  db.prepare(`UPDATE questions SET type = ?, question_text = ?, answer = ?, options = ?, difficulty = ?, time = ?, file = case when ? = '' then file else ? end, points = ? WHERE id = ?`)
+  db().prepare(`UPDATE questions SET type = ?, question_text = ?, answer = ?, options = ?, difficulty = ?, time = ?, file = case when ? = '' then file else ? end, points = ? WHERE id = ?`)
     .run(type, question_text.trim(), JSON.stringify(answer.map((o) => o.trim())), JSON.stringify(options.map((o) => o.trim())), diff, time || 15, fileUri || "", fileUri || "", points || 1, id);
 
-  res.json(parseQuestion(db.prepare("SELECT * FROM questions WHERE id = ?").get(id)));
+  res.json(parseQuestion(db().prepare("SELECT * FROM questions WHERE id = ?").get(id)));
 });
 
 router.delete("/astrolab-admin/api/questions/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
-  if (!db.prepare("SELECT id FROM questions WHERE id = ?").get(id)) {
+  if (!db().prepare("SELECT id FROM questions WHERE id = ?").get(id)) {
     return res.status(404).json({ error: "Nie znaleziono pytania." });
   }
-  db.prepare("DELETE FROM answers WHERE question_id = ?").run(id);
-  db.prepare("DELETE FROM questions WHERE id = ?").run(id);
+  db().prepare("DELETE FROM answers WHERE question_id = ?").run(id);
+  db().prepare("DELETE FROM questions WHERE id = ?").run(id);
   res.json({ success: true });
 });
 
@@ -158,7 +159,7 @@ router.post("/files", requireAdmin, upload, (req, res) => {
 // ── Players ───────────────────────────────────────────────────
 router.get("/astrolab-admin/api/players", requireAdmin, (_req, res) => {
   res.json(
-    db.prepare(`
+    db().prepare(`
       SELECT p.id, p.nick, p.score, p.created_at,
         (SELECT COUNT(*) FROM answers a WHERE a.player_id = p.id) AS total_answers,
         (SELECT COUNT(*) FROM answers a WHERE a.player_id = p.id AND a.correct = 1) AS correct_answers
@@ -170,20 +171,20 @@ router.get("/astrolab-admin/api/players", requireAdmin, (_req, res) => {
 router.put("/astrolab-admin/api/players/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
   const nick = req.body.nick?.trim();
-  if (!db.prepare("SELECT id FROM players WHERE id = ?").get(id)) {
+  if (!db().prepare("SELECT id FROM players WHERE id = ?").get(id)) {
     return res.status(404).json({ error: "Nie znaleziono gracza." });
   }
-  db.prepare("update players set nick = ? where id = ?").run(nick, id);
+  db().prepare("update players set nick = ? where id = ?").run(nick, id);
   res.json({ success: true });
 });
 
 router.delete("/astrolab-admin/api/players/:id", requireAdmin, (req, res) => {
   const { id } = req.params;
-  if (!db.prepare("SELECT id FROM players WHERE id = ?").get(id)) {
+  if (!db().prepare("SELECT id FROM players WHERE id = ?").get(id)) {
     return res.status(404).json({ error: "Nie znaleziono gracza." });
   }
-  db.prepare("DELETE FROM answers WHERE player_id = ?").run(id);
-  db.prepare("DELETE FROM players WHERE id = ?").run(id);
+  db().prepare("DELETE FROM answers WHERE player_id = ?").run(id);
+  db().prepare("DELETE FROM players WHERE id = ?").run(id);
   res.json({ success: true });
 });
 
@@ -213,5 +214,39 @@ router.get("/astrolab-admin/api/settings/timelimit", requireAdmin, (_req, res) =
 router.post("/astrolab-admin/api/settings/timelimit", requireAdmin, (req, res) => {
   res.json({ seconds: setTimelimit(req.body.seconds) });
 });
+
+router.get("/astrolab-admin/api/exporting_database", requireAdmin, (_req, res) => {
+  res.download(path.join(__dirname, '../data/baza.db'));
+});
+
+const importdb = multer({
+  storage: multer.diskStorage({
+    destination: "data",
+    filename: (req, file, cb) => {
+      cb(null, `baza.db`);
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    if (path.extname(file.originalname).toLowerCase() != ".db") {
+      return cb(null, false);
+    }
+    cb(null, true);
+  }
+}).single("dbFile");
+
+router.post("/astrolab-admin/api/importing_database", requireAdmin, (req, res) => {
+  importdb(req, res, (error) => {
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: "FGSFGFGHFGSGDF GLUPIE GFOOTGAWEIK_()+ERJAWS" });
+    }
+    res.json({ success: true });
+    
+  });
+});
+
+
 
 module.exports = router;

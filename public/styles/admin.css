@@ -1087,3 +1087,20 @@ td {
     border: 1px solid gray;
   }
 }
+
+.ultra-small {
+  font-size: 14px;
+}
+
+.collapsed {
+  display: none;
+  height: 0;
+}
+
+#db-header, button {
+  cursor:pointer;
+}
+
+input[type="file"] {
+  cursor:copy;
+}

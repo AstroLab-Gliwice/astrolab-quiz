@@ -23,6 +23,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(join(__dirname, "public"), { index: false }));
+//app.use('/data', express.static('data')); nie chce bazy publicznej wiec z tego zrezygnuje glupie gowno
 
 app.use(require("./routes/auth"));
 app.use(require("./routes/quiz"));
@@ -40,6 +41,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log("✅ astrolab-quiz - Aplikacja została uruchomiona!");
-  console.log(`🌐 Serwer został uruchomiony na porcie ${PORT}`);
+  console.log(`AstroLab Quiz uruchomiony na porcie ${PORT} (http://localhost:${PORT}).`);
 });
