@@ -362,6 +362,12 @@ td {
   color: var(--green);
   font-weight: 600;
   font-size: 12px;
+  filter: blur(3px);
+  cursor: zoom-in;
+}
+
+.q-answer:hover {
+  filter: blur(0);
 }
 
 .opts-list {

@@ -41,6 +41,26 @@ async function loadQuestion() {
     } else {
       renderStart({ ...data, clockOffset });
     }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+          console.log("Utracono fokus");
+          document.querySelector("body").style.filter = 'blur(10px)';
+      }
+      else {
+          document.querySelector("body").style.filter = 'blur(0)';
+          submitAnswer("__TIMEOUT__", "one");
+      }
+    });
+
+    window.addEventListener('blur', () => {
+        console.log("Utracono fokus");
+        document.querySelector("body").style.filter = 'blur(10px)';
+    })
+
+    window.addEventListener('focus', () => {
+        document.querySelector("body").style.filter = 'blur(0)';
+        submitAnswer("__TIMEOUT__", "one");
+    })
   } catch {
     mainEl.innerHTML = `<p style="color:var(--muted);padding:2rem;text-align:center">Błąd połączenia z serwerem.</p>`;
   }
