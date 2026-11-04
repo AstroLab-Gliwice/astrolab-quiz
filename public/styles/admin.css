@@ -146,14 +146,15 @@ body {
 }
 
 .page.active {
-  display: block;
-  animation: fadeIn .25s ease-out;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn .15s ease-out;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(20px);
   }
 
   to {
@@ -161,6 +162,16 @@ body {
     transform: translateY(0);
   }
 }
+
+@keyframes bigger {
+  from {
+    transform: translateY(-24px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 
 .page-header {
   margin-bottom: 24px;
@@ -362,8 +373,12 @@ td {
   color: var(--green);
   font-weight: 600;
   font-size: 12px;
-  filter: blur(3px);
+  filter: blur(7px);
   cursor: zoom-in;
+}
+
+.th-small {
+  width: 50px !important;
 }
 
 .q-answer:hover {
@@ -1001,7 +1016,7 @@ td {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .nextToNext {
@@ -1113,6 +1128,10 @@ td {
   cursor:pointer;
 }
 
+#db-content {
+  animation: bigger .15s ease-out;
+}
+
 input[type="file"] {
   cursor:copy;
 }
@@ -1143,4 +1162,41 @@ footer, footer a {
 .a-small-sur:hover {
   background: rgba(255, 255, 255, .1);
   color: #fff;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.down {
+  bottom: 0;
+}
+
+#qToolbar {
+  transition: all 0.2s;
+  position: fixed;
+  background-color: rgba(255, 255, 255, 0.57);
+  backdrop-filter: blur(5px);
+  margin: 10px;
+  padding: 5px 10px;
+  height: 45px;
+  width: 15%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.373);
+  animation: fadeIn .15s ease-out;
+}
+
+#page-questions {
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.page-header {
+  width: 100%;
 }

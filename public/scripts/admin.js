@@ -143,6 +143,7 @@ function renderQuestions() {
 
   tbody.innerHTML = questions.map((q) => `
           <tr>
+            <td><input type="checkbox" name="check-the-entry" class="check-the-entry"> </td>
             <td style="color:var(--muted);font-weight:700">${q.id}</td>
             <td><span class="code-badge">${esc(q.code)}</span></td>
             <td>${esc(q.type)}</td>
@@ -175,6 +176,23 @@ function renderQuestions() {
               </div>
             </td>
           </tr>`).join("");
+  document.querySelectorAll(".check-the-entry").forEach(el => {
+    el.addEventListener("click", () => {
+      if (document.querySelectorAll(".check-the-entry:checked").length != 0) {
+        if (document.querySelector("#qToolbar").classList.contains("hidden")) document.querySelector("#qToolbar").classList.remove("hidden");
+      }
+      else {
+        if (!document.querySelector("#qToolbar").classList.contains("hidden")) document.querySelector("#qToolbar").classList.add("hidden");
+      }
+      document.querySelector("#check-all-entries").checked = true;
+      document.querySelectorAll(".check-the-entry").forEach(ele => {
+        if (!ele.checked) {
+            document.querySelector("#check-all-entries").checked = false;
+            return;
+        } 
+      });
+    })
+  });
 }
 
 function copyUrl(url) {
@@ -742,6 +760,38 @@ backdrop.addEventListener("click", closeSidebar);
 document.querySelectorAll(".nav-btn").forEach((btn) => {
   btn.addEventListener("click", () => { if (window.innerWidth <= 768) closeSidebar(); });
 });
+
+// ----------------------------------------------------------
+
+document.querySelector("#check-all-entries").addEventListener("click", () => {
+  if (document.querySelector("#check-all-entries").checked == true) {
+    document.querySelectorAll(".check-the-entry").forEach(element => {
+        element.checked = true;
+        if (document.querySelector("#qToolbar").classList.contains("hidden")) document.querySelector("#qToolbar").classList.remove("hidden");
+    });
+  }
+  else {
+    document.querySelectorAll(".check-the-entry").forEach(element => {
+      element.checked = false;
+      if (!document.querySelector("#qToolbar").classList.contains("hidden")) document.querySelector("#qToolbar").classList.add("hidden");
+    });
+  }
+});
+
+document.querySelector("#delete-checked").addEventListener('click', async () => {
+  const checked = document.querySelectorAll(".check-the-entry:checked");
+  if (checked.length == 0) return;
+  if (!await openConfirm("Usuń pytania", `Usunąć te pytania?\nZostaną usunięte też odpowiedzi graczy.`)) return;
+  for (const element of checked) {
+        const id = element.closest("tr").cells[1].textContent.trim();
+        const q = questions.find((x) => String(x.id) === id); 
+        if (q) {
+          const { ok } = await api(`/astrolab-admin/api/questions/${id}`, { method: "DELETE" });
+          ok ? toast("Wybrane pytania usunięte.") : toast("Błąd usuwania.", "err");
+        };
+    }
+  loadQuestions()
+})
 
 
 

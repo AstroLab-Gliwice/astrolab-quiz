@@ -92,16 +92,24 @@ done_all
       <div class="card">
         <div class="card-header">
           <h2>Lista pytań</h2>
-          <button class="btn btn-primary" id="addQBtn">＋ Dodaj pytanie</button>
+          <div>
+            <button class="btn btn-primary" id="addQBtn">＋ Dodaj pytanie</button>
+          </div>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>ID</th><th>Kod</th><th>Typ</th><th>Link URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedzi</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
+              <tr><th class="th-small"><input type="checkbox" name="check-all-entries" id="check-all-entries"> </th><th class="th-small">ID</th><th>Kod</th><th>Typ</th><th>Link URL</th><th>Pytanie</th><th>Opcje</th><th>Odpowiedzi</th><th>Załącznik</th><th>Czas</th><th>Poziom</th><th>Pkt</th><th>Akcje</th></tr>
             </thead>
             <tbody id="qBody"></tbody>
           </table>
         </div>
+      </div>
+      <div class="down hidden" id="qToolbar"> <!-- Następnym razem się zrobi lepiej, niż ukrywanie/pokazywanie na pozniej -->
+        <button class="btn btn-danger btn-sm" id="delete-checked"><span class="material-symbols-outlined">
+          delete
+        </span></button>
+        <!-- Miejsce na pobieranie -->
       </div>
     </div>
 
@@ -365,7 +373,9 @@ print
     <!-- Confirm dialog -->
     <div class="overlay" id="confirmOverlay">
       <div class="confirm-box">
-        <div class="confirm-icon">⚠️</div>
+        <div class="confirm-icon"><span class="material-symbols-outlined">
+warning
+</span></div>
         <h3 id="confirmTitle"></h3>
         <p id="confirmMsg"></p>
         <div class="confirm-btns">
