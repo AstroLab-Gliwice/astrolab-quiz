@@ -105,18 +105,13 @@ function renderStart({ question, player, timelimit, clockOffset = 0 }) {
 
 // ── Question screen ───────────────────────────────────────
 function renderQuestion({ qType, question, player, timelimit, difficulty, file, startedAt, clockOffset = 0 }) {
-  let diffText = "";
+  const DIFFICULTY = { easy: "Łatwy", medi: "Normalny", hard: "Wymagający" };
+  const QTYPE = {
+    one: { label: "Jednokrotny wybór", icon: "radio_button_checked" },
+    many: { label: "Wielokrotny wybór", icon: "library_add_check" },
+  };
+  const { label: quType, icon: quIcon } = QTYPE[qType] || {};
   let type = "";
-  let quType = "";
-  switch (difficulty) {
-    case ("easy"): diffText = "Łatwy"; break;
-    case ("medi"): diffText = "Normalny"; break;
-    case ("hard"): diffText = "Wymagający"; break;
-  }
-  switch (qType) {
-    case ("one"): quType = "Pytanie jednokrotnego wyboru"; break;
-    case ("many"): quType = "Pytanie wielokrotnego wyboru"; break;
-  }
   const extension = file.split(".").pop().toLowerCase();
   if (["png", "jpg", "jpeg", "gif", "webp", "svg"].includes(extension)) {
     type = `<img class="fit" draggable="false" src="${file}" />`;
@@ -134,16 +129,8 @@ function renderQuestion({ qType, question, player, timelimit, difficulty, file, 
         <div class="panel quiz-card">
           <div class="player-bar">👤 <span class="nick">${esc(player.nick)}</span></div>
           <div class="column">
-            <div class="question-meta">
-              <span class="question-number">Pytanie #${question.id}</span>
-            </div>
-            <div class="row">
-                <div class="question-text">${esc(question.text)}</div>
-                <div class="column right">
-                  <div class="difficulty-wrap ${difficulty}"><span>${diffText}</span></div>
-                  <span class="question-type">${quType}</span>
-                </div>
-            </div>
+            <span class="question-number">Pytanie #${question.id}</span>
+            <div class="question-text">${esc(question.text)}</div>
             ${type}
           </div>
           <div class="timer-wrap">
@@ -151,6 +138,10 @@ function renderQuestion({ qType, question, player, timelimit, difficulty, file, 
               <div class="timer-bar-fill" id="timerFill" style="width:100%"></div>
             </div>
             <div class="timer-label" id="timerLabel">${timelimit}s</div>
+          </div>
+          <div class="badges">
+            <span class="question-type ${qType}"><span class="material-symbols-outlined">${quIcon}</span><span class="qt-text">${quType}</span></span>
+            <span class="difficulty-wrap ${difficulty}">${DIFFICULTY[difficulty] || ""}</span>
           </div>
           <div class="divider"></div>
           <div class="answers" id="answers">
@@ -187,23 +178,20 @@ function renderQuestion({ qType, question, player, timelimit, difficulty, file, 
   else {
     answersEl.addEventListener("click", (e) => {
       const el = e.target.closest(".answer");
-      //if (!el || el.classList.contains("disabled")) return;
-      if (el.classList.contains("selected")) {
-        el.classList.remove("selected");
-        selectedAnswer = selectedAnswer.filter(text => text != el.textContent.trim());
-      }
-      else {
-        el.classList.add("selected");
-        selectedAnswer.push(el.textContent.trim());
-        submitBtn.classList.add("active");
-        submitBtn.disabled = false;
-      }
+      if (!el || el.classList.contains("disabled")) return;
+      const text = el.textContent.trim();
+      el.classList.toggle("selected");
+      selectedAnswer = el.classList.contains("selected")
+        ? [...selectedAnswer, text]
+        : selectedAnswer.filter((t) => t !== text);
+      const hasAnswer = selectedAnswer.length > 0;
+      submitBtn.classList.toggle("active", hasAnswer);
+      submitBtn.disabled = !hasAnswer;
     });
   }
-  
 
   submitBtn.addEventListener("click", () => {
-    if (selectedAnswer) submitAnswer(selectedAnswer, qType);
+    if (selectedAnswer && selectedAnswer.length !== 0) submitAnswer(selectedAnswer, qType);
   });
 
   // ── Timer (rAF — smooth, server-based) ───────────────────
