@@ -7,6 +7,7 @@
   <link rel="shortcut icon" href="/logo/astrolab-main.svg" type="image/x-icon" />
   <link rel="stylesheet" href="/styles/style.css" />
   <link rel="stylesheet" href="/styles/register.css">
+  <link rel="stylesheet" href="/styles/astrolloween-seasonal.css">
 </head>
 <body>
   <div class="logo"><img src="/logo/astrolab-halloween.svg" alt="AstroLab" /></div>
@@ -14,59 +15,15 @@
   <div class="card">
     <h1>Rozpocznij grę</h1>
     <div class="error-msg" id="errorMsg"></div>
-    <input type="text" id="nickInput" placeholder="Twój nickname" maxlength="20" autocomplete="off" />
+    <input type="text" id="nickInput" placeholder="Twoje imię i nazwisko" maxlength="20" autocomplete="off" />
     <div class="info-msg">
-      ⚠️ <strong>Uwaga:</strong> Konta z nieodpowiednimi lub wulgarnymi nickami będą usuwane z rankingu.
+      ⚠️ <strong>Uwaga:</strong> Konta z nieodpowiednimi lub wulgarnymi nickami będą usuwane z rankingu. W ramach konkursu Astrolloween, proszę podać imię i nazwisko.
     </div>
     <button id="submitBtn" disabled>Zatwierdź</button>
   </div>
 
   <footer>&copy; 2026 AstroLab &middot; Made with &hearts;</footer>
 
-  <script>
-    const returnTo   = new URLSearchParams(location.search).get("returnTo") || "/";
-    const nickInput  = document.getElementById("nickInput");
-    const submitBtn  = document.getElementById("submitBtn");
-    const errorMsg   = document.getElementById("errorMsg");
-
-    function setActive(active) {
-      submitBtn.disabled = !active;
-      submitBtn.classList.toggle("active", active);
-    }
-
-    nickInput.addEventListener("input", () => setActive(nickInput.value.trim() !== ""));
-    document.addEventListener("keydown", (e) => { if (e.key === "Enter" && !submitBtn.disabled) register(); });
-    submitBtn.addEventListener("click", register);
-
-    async function register() {
-      const nick = nickInput.value.trim();
-      if (!nick) return;
-
-      setActive(false);
-      errorMsg.style.display = "none";
-
-      try {
-        const res = await fetch("/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nick, returnTo }),
-        });
-        const data = await res.json();
-
-        if (!res.ok) {
-          errorMsg.textContent = data.error || "Wystąpił błąd. Spróbuj ponownie.";
-          errorMsg.style.display = "block";
-          setActive(nick !== "");
-          return;
-        }
-
-        location.replace(data.redirectTo);
-      } catch {
-        errorMsg.textContent = "Problem z połączeniem. Sprawdź internet i spróbuj ponownie.";
-        errorMsg.style.display = "block";
-        setActive(nickInput.value.trim() !== "");
-      }
-    }
-  </script>
+  <script src="/scripts/register.js"></script>
 </body>
 </html>

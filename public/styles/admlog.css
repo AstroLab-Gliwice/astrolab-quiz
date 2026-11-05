@@ -78,3 +78,7 @@ h1 {
   width: 100%;
   display: none;
 }
+
+.ultra-ultra-ultra-small {
+  font-size: 10px !important;
+}

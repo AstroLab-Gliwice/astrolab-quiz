@@ -162,7 +162,7 @@ function renderQuestions() {
             <td class="q-text">${esc(q.question_text)}</td>
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
             <td class="q-answer">${q.answer.map((o) => esc(o)).join(", ")}</td>
-            <td class="td-small">${q.file ? `<a href="${esc(q.file)}" target="_blank" rel="noopener">Załącznik</a>` : `<span>brak</span>`}</td>
+            <td class="td-small">${q.file ? `<a href="${esc(q.file)}" target="_blank" rel="noopener">Załącznik</a>` : `<span>-</span>`}</td>
             <td class="td-small">${esc(q.time)}s</td>
             <td class="td-small">${esc(q.difficulty)}</td>
             <td class="td-small"><span class="points-badge">${q.points} pkt</span></td>
@@ -438,6 +438,7 @@ function renderPlayers(list) {
   }
   tbody.innerHTML = list.map((p, i) => `
           <tr>
+            <td><input type="checkbox" data-nick="${esc(p.id)}" name="check-the-player" class="check-the-player"></td>
             <td class="rank-cell">${i + 1}</td>
             <td class="nick-cell">${esc(p.nick)}</td>
             <td class="score-cell">${p.score} pkt</td>
@@ -457,6 +458,24 @@ function renderPlayers(list) {
               
             
           </tr>`).join("");
+  
+  document.querySelectorAll(".check-the-player").forEach(el => {
+    el.addEventListener("click", () => {
+      if (document.querySelectorAll(".check-the-player:checked").length != 0) {
+        if (document.querySelector("#pToolbar").classList.contains("hidden")) document.querySelector("#pToolbar").classList.remove("hidden");
+      }
+      else {
+        if (!document.querySelector("#pToolbar").classList.contains("hidden")) document.querySelector("#pToolbar").classList.add("hidden");
+      }
+      document.querySelector("#check-all-players").checked = true;
+      document.querySelectorAll(".check-the-player").forEach(ele => {
+        if (!ele.checked) {
+            document.querySelector("#check-all-players").checked = false;
+            return;
+        } 
+      });
+    })
+  });
 }
 
 document.getElementById("playerSearch").oninput = function () {
@@ -786,6 +805,7 @@ document.querySelectorAll(".nav-btn").forEach((btn) => {
 
 // ----------------------------------------------------------
 
+//pytania
 document.querySelector("#check-all-entries").addEventListener("click", () => {
   if (document.querySelector("#check-all-entries").checked == true) {
     document.querySelectorAll(".check-the-entry").forEach(element => {
@@ -797,6 +817,22 @@ document.querySelector("#check-all-entries").addEventListener("click", () => {
     document.querySelectorAll(".check-the-entry").forEach(element => {
       element.checked = false;
       if (!document.querySelector("#qToolbar").classList.contains("hidden")) document.querySelector("#qToolbar").classList.add("hidden");
+    });
+  }
+});
+
+//gracze
+document.querySelector("#check-all-players").addEventListener("click", () => {
+  if (document.querySelector("#check-all-players").checked == true) {
+    document.querySelectorAll(".check-the-player").forEach(element => {
+        element.checked = true;
+        if (document.querySelector("#pToolbar").classList.contains("hidden")) document.querySelector("#pToolbar").classList.remove("hidden");
+    });
+  }
+  else {
+    document.querySelectorAll(".check-the-player").forEach(element => {
+      element.checked = false;
+      if (!document.querySelector("#pToolbar").classList.contains("hidden")) document.querySelector("#pToolbar").classList.add("hidden");
     });
   }
 });
@@ -813,10 +849,27 @@ document.querySelector("#delete-checked").addEventListener('click', async () => 
           ok ? toast("Wybrane pytania usunięte.") : toast("Błąd usuwania.", "err");
         };
     }
-  loadQuestions()
+  loadQuestions();
 })
 
+document.querySelector("#p-delete-checked").addEventListener('click', async () => {
+  const checked = document.querySelectorAll(".check-the-player:checked");
+  if (checked.length == 0) return;
+  if (!await openConfirm("Usuń graczy", `Usunąć tych graczy?\nZmieni się tablica graczy, a usunięci gracze nie będą mieli swoich odpowiedzi.`)) return;
+  for (const element of checked) {
+        const id = element.getAttribute("data-nick");
+        if (id) {
+          const { ok } = await api(`/astrolab-admin/api/players/${id}`, { method: "DELETE" });
+           ok ? (toast("Gracze usunięci."), loadPlayers()) : toast("Błąd usuwania graczy.", "err");
+           if (!document.querySelector("#pToolbar").classList.contains("hidden")) document.querySelector("#pToolbar").classList.add("hidden");
+           document.querySelector("#check-all-players").checked = false;
+        };
+    }
+  loadPlayers();
+})
 
+  
+ 
 
 // ── Init ──────────────────────────────────────────────────
 loadDashboard();

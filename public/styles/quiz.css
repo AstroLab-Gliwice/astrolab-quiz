@@ -8,7 +8,7 @@ main {
 
 .panel {
   background: var(--card);
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
   max-width: 400px;
   width: 100%;
@@ -67,7 +67,7 @@ main {
   display: flex;
   align-items: center;
   background: #f3f4f6;
-  border-radius: 10px;
+  border-radius: 100px;
   padding: 10px 14px;
   font-size: 13px;
   color: var(--muted);
@@ -109,9 +109,19 @@ main {
   gap: 10px;
 }
 
+@keyframes fadeInAnswe {
+  from {
+    transform: translateX(-20px);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
 .answer {
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 100px;
   background: var(--bg);
   border: 2px solid var(--border);
   font-weight: 500;
@@ -122,6 +132,7 @@ main {
   align-items: center;
   gap: 12px;
   color: var(--text);
+  animation: fadeInAnswe .2s ease-out;
 }
 
 .answer::before {
@@ -129,13 +140,13 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  min-width: 30px;
+  height: 30px;
+  border-radius: 100px;
   background: var(--border);
   color: var(--muted);
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: bolder;
+  font-size: 16px;
   flex-shrink: 0;
   transition: all .15s;
 }
@@ -178,7 +189,7 @@ main {
   transition: background .2s;
   width: 100%;
 
-  margin: 15px 0;
+  margin: 10px 0 0 0;
 }
 
 .submit-btn.active {
@@ -274,6 +285,7 @@ main {
   justify-content: center;
   height: 30px;
   padding: 0 14px;
+  gap: 6px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
@@ -351,8 +363,12 @@ audio {
   white-space: nowrap;
 }
 
-.question-type .material-symbols-outlined {
-  font-size: 16px;
+.qt-text {
+  font-weight: 500;
+}
+
+.question-type .material-symbols-outlined, .difficulty-wrap .material-symbols-outlined {
+  font-size: 16px !important;
   width: 16px;
   height: 16px;
   overflow: hidden;

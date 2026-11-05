@@ -101,12 +101,17 @@ function renderStart({ question, player, timelimit, clockOffset = 0 }) {
 
 // ── Question screen ───────────────────────────────────────
 function renderQuestion({ qType, question, player, timelimit, difficulty, file, startedAt, clockOffset = 0 }) {
-  const DIFFICULTY = { easy: "Łatwy", medi: "Normalny", hard: "Wymagający" };
   const QTYPE = {
-    one: { label: "Jednokrotny wybór", icon: "radio_button_checked" },
+    one: { label: "Jednokrotny wybór", icon: "check_circle" },
     many: { label: "Wielokrotny wybór", icon: "library_add_check" },
   };
+  const DIFFICULTY  = {
+    easy: { label: "Łatwy", icon: "signal_cellular_1_bar" },
+    medi: { label: "Normalny", icon: "signal_cellular_3_bar" },
+    hard: { label: "Wymagający", icon: "signal_cellular_4_bar" },
+  };
   const { label: quType, icon: quIcon } = QTYPE[qType] || {};
+  const { label: diType, icon: diIcon } = DIFFICULTY[difficulty] || {};
   let type = "";
   const extension = file.split(".").pop().toLowerCase();
   if (["png", "jpg", "jpeg", "gif", "webp", "svg"].includes(extension)) {
@@ -137,7 +142,7 @@ function renderQuestion({ qType, question, player, timelimit, difficulty, file, 
           </div>
           <div class="badges">
             <span class="question-type ${qType}"><span class="material-symbols-outlined">${quIcon}</span><span class="qt-text">${quType}</span></span>
-            <span class="difficulty-wrap ${difficulty}">${DIFFICULTY[difficulty] || ""}</span>
+            <span class="difficulty-wrap ${difficulty}"><span class="material-symbols-outlined">${diIcon}</span><span class="qt-text">${diType}</span></span>
           </div>
           <div class="divider"></div>
           <div class="answers" id="answers">

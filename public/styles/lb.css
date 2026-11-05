@@ -17,7 +17,6 @@ h1 {
 .subtitle {
   font-size: 13px;
   color: var(--muted);
-  margin-bottom: 24px;
 }
 
 .content {
@@ -38,9 +37,13 @@ h1 {
 }
 
 .podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
   background: var(--card);
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
   text-align: center;
   padding: 16px 12px;
@@ -49,36 +52,80 @@ h1 {
   border-top: 4px solid transparent;
 }
 
+@keyframes scrollin {
+  0% {
+    transform: translateX(-250px);
+  }
+  30%, 70% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(250px);
+  }
+}
+
 .podium-item:nth-child(1) {
   border-color: #f59e0b;
+  background: #000000;
+  background: linear-gradient(0deg,rgb(255, 255, 255) 50%, #f59e0b 100%);
   min-height: 120px;
   order: 2;
+  overflow-wrap: anywhere;
 }
 
 .podium-item:nth-child(2) {
   border-color: #94a3b8;
-  min-height: 100px;
+  background: #000000;
+  background: linear-gradient(0deg,rgb(255, 255, 255) 50%, rgba(148, 163, 184, 1) 100%);
+  min-height: 105px;
   order: 1;
+  overflow-wrap: anywhere;
 }
 
 .podium-item:nth-child(3) {
   border-color: #b45309;
-  min-height: 85px;
+  background: #000000;
+  background: linear-gradient(0deg,rgb(255, 255, 255) 50%, #b45309 100%);
+  max-height: 95px;
   order: 3;
+  overflow-wrap: anywhere;
 }
 
-.podium-medal {
-  font-size: 1.4rem;
+.podium-item:nth-child(3) > .podium-medal  {
+  font-size: 45px;
+  margin-top: -45px;
   margin-bottom: 4px;
+  min-width: 120px;
 }
 
+.podium-item:nth-child(2) > .podium-medal  {
+  font-size: 60px;
+  margin-top: -60px;
+  margin-bottom: 4px;
+  min-width: 120px;
+}
+
+.podium-item:nth-child(1) > .podium-medal  {
+  font-size: 70px;
+  margin-top: -55px;
+  margin-bottom: 4px;
+  min-width: 120px;
+}
 .podium-nick {
   font-weight: 700;
-  font-size: .85rem;
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+
+.podium-nick > span {
+  max-width: 150px;
+  display: inline-block;
+  animation: scrollin infinite linear 15s;
+}
+
 
 .podium-score {
   color: var(--primary);
@@ -90,7 +137,7 @@ h1 {
 /* ── Table ───────────────────────────────────────────────── */
 .table-card {
   background: var(--card);
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
   overflow: hidden;
 }
@@ -160,4 +207,26 @@ h1 {
   body {
     padding: 40px 20px;
   }
+}
+
+.btn-outline {
+  color: white !important;
+  border-color: white !important;
+}
+
+.btn-outline:hover {
+  background: #eef4f95c !important; 
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background-color: white;
+  min-width: auto;
+  padding: 10px 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
+  margin-bottom: 24px;
 }

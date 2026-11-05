@@ -32,7 +32,7 @@ async function load() {
       podiumEl.innerHTML = players.slice(0, 3).map((p, i) => `
             <div class="podium-item">
               <div class="podium-medal">${MEDALS[i]}</div>
-              <div class="podium-nick">${esc(p.nick)}</div>
+              <div class="podium-nick"><span>${esc(p.nick)}</span></div>
               <div class="podium-score">${p.score} pkt</div>
             </div>`).join("");
     } else {

@@ -1,7 +1,7 @@
 .card {
   background: var(--card);
   padding: 30px 20px;
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
   max-width: 400px;
   width: 100%;
@@ -68,6 +68,24 @@ h1 {
 .social-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 440px) {
+  .btn-social {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: auto !important;
+    padding: 9px 16px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.1s;
+  }
 }
 
 .btn-social {
@@ -75,8 +93,9 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 100%;
   gap: 8px;
-  padding: 9px 16px;
+  padding: 7px 14px;
   border-radius: 100px;
   font-size: 14px;
   font-weight: 600;
@@ -85,8 +104,8 @@ h1 {
 }
 
 .btn-social:hover {
-  opacity: 0.88;
-  transform: translateY(-1px);
+  opacity: 0.68;
+  transform: translateY(-2px);
 }
 
 .btn-social:active {
@@ -109,7 +128,14 @@ h1 {
 }
 
 .btn-instagram {
+  transition: all 0.2s;
   background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4);
+  color: #fff;
+}
+
+.btn-instagram:hover {
+  transition: all 0.2s;
+  background: linear-gradient(-75deg, #f58529, #dd2a7b, #8134af, #515bd4);
   color: #fff;
 }
 
@@ -122,4 +148,8 @@ h1 {
 .social-icon {
   aspect-ratio: 1/1;
   width: 20px;
+}
+
+.smaller-divid {
+  margin: 2px 0;
 }

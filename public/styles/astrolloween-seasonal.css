@@ -1,1 +1,15 @@
 /* sezonowy design Astrolab Quiz */
+
+body {
+    background-image: url("/img/halloween.jpg");
+    background-repeat: repeat;
+    background-size: cover;
+}
+
+footer {
+    color: white;
+}
+
+.logo img {
+    border-radius: 100px;
+}

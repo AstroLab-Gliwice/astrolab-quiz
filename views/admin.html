@@ -133,11 +133,17 @@ done_all
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>#</th><th>Nazwa użytkownika</th><th>Punkty</th><th>Udzielonych odpowiedzi</th><th>Poprawnych</th><th>Data zalogowania</th><th>Akcje</th></tr>
+              <tr><th><input type="checkbox" id="check-all-players"></th><th>#</th><th>Nazwa użytkownika</th><th>Punkty</th><th>Udzielonych odpowiedzi</th><th>Poprawnych</th><th>Data zalogowania</th><th>Akcje</th></tr>
             </thead>
             <tbody id="pBody"></tbody>
           </table>
         </div>
+      </div>
+      <div class="down hidden" id="pToolbar"> <!-- Następnym razem się zrobi lepiej, niż ukrywanie/pokazywanie na pozniej -->
+        <button class="btn btn-danger btn-sm" id="p-delete-checked" title="Usuń zaznaczone pytania"><span class="material-symbols-outlined">
+          delete
+        </span></button>
+        <!-- Miejsce na pobieranie -->
       </div>
     </div>
 
