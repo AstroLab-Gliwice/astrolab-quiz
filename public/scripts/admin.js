@@ -136,6 +136,10 @@ async function loadQuestions() {
 
 function renderQuestions() {
   const tbody = document.getElementById("qBody");
+
+  document.getElementById("qToolbar").classList.add("hidden");
+  document.getElementById("check-all-entries").checked = false;
+
   if (!questions.length) {
     emptyRow("qBody", 'Brak pytań. Kliknij "Nowe pytanie", aby dodać pytanie.');
     return;
@@ -143,8 +147,8 @@ function renderQuestions() {
 
   tbody.innerHTML = questions.map((q) => `
           <tr>
-            <td><input type="checkbox" name="check-the-entry" class="check-the-entry"> </td>
-            <td style="color:var(--muted);font-weight:700">${q.id}</td>
+            <td class="td-small"><input type="checkbox" name="check-the-entry" class="check-the-entry"></td>
+            <td class="td-small" style="color:var(--muted);font-weight:700">${q.id}</td>
             <td><span class="code-badge">${esc(q.code)}</span></td>
             <td>${esc(q.type)}</td>
             <td>
@@ -158,7 +162,7 @@ function renderQuestions() {
             <td class="q-text">${esc(q.question_text)}</td>
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
             <td class="q-answer">${q.answer.map((o) => esc(o)).join(", ")}</td>
-            <td><a href="${esc(q.file)}">Załącznik</a></td>
+            <td>${q.file ? `<a href="${esc(q.file)}" target="_blank" rel="noopener">Załącznik</a>` : `<span>brak</span>`}</td>
             <td>${esc(q.time)}s</td>
             <td>${esc(q.difficulty)}</td>
             <td><span class="points-badge">${q.points} pkt</span></td>
