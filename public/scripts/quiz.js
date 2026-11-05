@@ -8,6 +8,22 @@ function esc(str) {
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+const GRACE_MS = 500;
+let armedAt = 0;
+let submitting = false;
+
+const arm = () => { armedAt = Date.now() + GRACE_MS; };
+
+function cheatDetected() {
+  if (!armedAt || Date.now() < armedAt) return;
+  document.body.style.filter = "blur(10px)";
+  submitAnswer("__TIMEOUT__", "one");
+}
+
+window.addEventListener("blur", cheatDetected);
+document.addEventListener("visibilitychange", () => document.hidden && cheatDetected());
+["contextmenu", "copy"].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault()));
+
 // ── Load ──────────────────────────────────────────────────
 async function loadQuestion() {
   mainEl.innerHTML = `<p style="color:var(--muted);padding:2rem;text-align:center">⏳ Ładowanie...</p>`;
@@ -41,26 +57,6 @@ async function loadQuestion() {
     } else {
       renderStart({ ...data, clockOffset });
     }
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-          console.log("Utracono fokus");
-          document.querySelector("body").style.filter = 'blur(10px)';
-      }
-      else {
-          document.querySelector("body").style.filter = 'blur(0)';
-          submitAnswer("__TIMEOUT__", "one");
-      }
-    });
-
-    window.addEventListener('blur', () => {
-        console.log("Utracono fokus");
-        document.querySelector("body").style.filter = 'blur(10px)';
-    })
-
-    window.addEventListener('focus', () => {
-        document.querySelector("body").style.filter = 'blur(0)';
-        submitAnswer("__TIMEOUT__", "one");
-    })
   } catch {
     mainEl.innerHTML = `<p style="color:var(--muted);padding:2rem;text-align:center">Błąd połączenia z serwerem.</p>`;
   }
@@ -195,6 +191,7 @@ function renderQuestion({ qType, question, player, timelimit, difficulty, file, 
   });
 
   // ── Timer (rAF — smooth, server-based) ───────────────────
+  arm();
   let timerExpired = false;
   let lastDisplayedSecond = null;
 
@@ -240,6 +237,9 @@ function renderQuestion({ qType, question, player, timelimit, difficulty, file, 
 
 // ── Submit ────────────────────────────────────────────────
 async function submitAnswer(answer, type) {
+  if (submitting) return;
+  submitting = true;
+  armedAt = 0;
   const isTimeout = answer === "__TIMEOUT__";
   const submitBtn = document.getElementById("submitBtn");
   if (submitBtn) {
@@ -264,6 +264,8 @@ async function submitAnswer(answer, type) {
     if (submitBtn) submitBtn.textContent = wasTimeout ? "⏰ Czas minął!" : "Wysyłanie...";
     setTimeout(() => location.replace(wasTimeout ? "/answer?timeout=1" : "/answer"), 600);
   } catch {
+    submitting = false;
+    if (!isTimeout) arm();
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = isTimeout ? "⏰ Czas minął!" : "Zatwierdź odpowiedź";
