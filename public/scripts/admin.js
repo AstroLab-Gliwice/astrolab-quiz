@@ -636,9 +636,29 @@ function downloadPng(canvas, suffix = "") {
 
 document.getElementById("qrDownloadBtn").onclick = () => downloadPng(document.getElementById("qrCanvas"));
 
-document.getElementById("qrPrintBtn").addEventListener("click", () => {
+async function printQR(list) {
+  list = list.filter(Boolean);
+  if (!list.length) return;
+  const sheet = document.getElementById("qrSheet");
+  const canvases = list.map(() => document.createElement("canvas"));
+  sheet.replaceChildren(...canvases);
+  await Promise.all(list.map((q, i) => new Promise((done) =>
+    generateQR(`${location.origin}/quiz/${q.code}`, q.id, DIFF_LABELS[q.difficulty], canvases[i], done))));
+  document.body.classList.add("printing");
   window.print();
+}
+
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("printing");
+  document.getElementById("qrSheet").replaceChildren();
 });
+
+document.getElementById("qrPrintBtn").addEventListener("click", () =>
+  printQR([questions.find((x) => x.code === _currentQrUrl.split("/").pop())]));
+
+document.getElementById("print-checked").addEventListener("click", () =>
+  printQR([...document.querySelectorAll(".check-the-entry:checked")]
+    .map((el) => questions.find((x) => String(x.id) === el.closest("tr").cells[1].textContent.trim()))));
 
 document.getElementById("qrDownloadTransparentBtn").onclick = () => {
   const { src, id, label } = _qrParts;
@@ -660,7 +680,7 @@ document.getElementById("qrDownloadTransparentBtn").onclick = () => {
   overlayLogo(ctx, SIZE, () => downloadPng(out, "-transparent"));
 };
 
-function generateQR(url, id, label) {
+function generateQR(url, id, label, canvas = document.getElementById("qrCanvas"), onDone) {
   const RENDER = 800;
   const hidden = document.createElement("div");
   hidden.style.cssText = "position:absolute;left:-9999px;top:-9999px;";
@@ -679,9 +699,8 @@ function generateQR(url, id, label) {
     .then((f) => { _qrIconOk = f.length > 0; }, () => { _qrIconOk = false; })
     .then(() => setTimeout(() => {
       const src = hidden.querySelector("canvas");
-      if (!src) { document.body.removeChild(hidden); return; }
+      if (!src) { document.body.removeChild(hidden); onDone?.(); return; }
 
-      const canvas = document.getElementById("qrCanvas");
       const H = RENDER + QR_LABEL_H;
       canvas.width = RENDER;
       canvas.height = H;
@@ -694,7 +713,7 @@ function generateQR(url, id, label) {
 
       drawQrFooter(ctx, RENDER, id, label);
       _qrParts = { src, id, label };
-      overlayLogo(ctx, RENDER);
+      overlayLogo(ctx, RENDER, onDone);
     }, 150));
 }
 

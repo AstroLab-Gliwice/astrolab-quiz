@@ -1086,38 +1086,46 @@ td.td-small {
   margin-right: 15px;
 }
 
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+#qrSheet {
+  display: none;
+}
+
 @media print {
-  * {
-    visibility: hidden;
+  body.printing {
+    display: block;
+    min-height: 0;
   }
 
-  #qrModal,
-  #qrModal * {
-    visibility: visible !important;
-    box-shadow: none !important;
-  }
-
-  #qrModal {
+  body.printing > :not(#qrSheet) {
     position: absolute;
-    inset: 0;
-    display: block !important;
-    padding: 0;
-    background: white;
-    box-shadow: none !important;
+    visibility: hidden;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
   }
 
-  #qrModal .modal-hdr,
-  #qrModal .qr-url-label,
-  #qrModal .qr-actions {
-    display: none !important;
-    box-shadow: none !important;
+  body.printing #qrSheet {
+    display: block;
+    font-size: 0;
+    orphans: 1;
+    widows: 1;
   }
 
-  #qrCanvas {
-    width: 420px !important;
-    height: auto  !important;
-    box-shadow: none !important;
-    border: 1px solid gray;
+  #qrSheet canvas {
+    width: 69mm;
+    height: 82mm;
+    margin: 4.5mm 12.9mm;
+    vertical-align: top;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 3mm;
+    break-inside: avoid;
   }
 }
 
@@ -1193,11 +1201,12 @@ footer, footer a {
   padding: 5px 10px;
   height: 45px;
   width: 15%;
-  min-width: 100px;
+  min-width: 160px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 8px;
   border-radius: 100px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.373);
   animation: fadeIn .15s ease-out;

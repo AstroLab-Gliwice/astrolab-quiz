@@ -106,7 +106,12 @@ done_all
         </div>
       </div>
       <div class="down hidden" id="qToolbar"> <!-- Następnym razem się zrobi lepiej, niż ukrywanie/pokazywanie na pozniej -->
-        <button class="btn btn-danger btn-sm" id="delete-checked"><span class="material-symbols-outlined">
+        <button class="btn btn-qr btn-sm" id="print-checked" title="Wydrukuj kody QR zaznaczonych pytań"><span class="material-symbols-outlined">
+          qr_code_scanner
+        </span><span class="material-symbols-outlined">
+          print
+        </span></button>
+        <button class="btn btn-danger btn-sm" id="delete-checked" title="Usuń zaznaczone pytania"><span class="material-symbols-outlined">
           delete
         </span></button>
         <!-- Miejsce na pobieranie -->
@@ -406,5 +411,6 @@ person_edit
       <p>&copy; 2026 <a href="https://github.com/AstroLab-Gliwice">AstroLab</a> Gliwi<a href="https://github.com/kwymyslo">c</a><a href="https://github.com/i5cmd">e</a></p>
     </footer>
 </main>
+<div id="qrSheet"></div>
 </body>
 </html>
