@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 // Wyłącz cache dla wszystkich dynamicznych tras
 app.use((req, res, next) => {
-  if (!req.path.match(/\.(css|js|svg|png|ico|woff2?)$/)) {
+  if (!req.path.match(/\.(jpg|jpeg|css|js|svg|png|ico|woff2?)$/)) {
     res.set("Cache-Control", "no-store, no-cache, must-revalidate");
     res.set("Pragma", "no-cache");
   }
