@@ -6,6 +6,7 @@ require("dotenv").config({ quiet: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.LISTEN_HOST || "127.0.0.1";
 const VIEWS = join(__dirname, "views");
 
 app.set("trust proxy", 1);
@@ -40,6 +41,6 @@ app.use((req, res) => {
   res.status(404).sendFile("404.html", { root: VIEWS });
 });
 
-app.listen(PORT, () => {
-  console.log(`AstroLab Quiz uruchomiony na porcie ${PORT} (http://localhost:${PORT}).`);
+app.listen(PORT, HOST, () => {
+  console.log(`AstroLab Quiz uruchomiony na porcie ${PORT} (http://${HOST}:${PORT}).`);
 });
