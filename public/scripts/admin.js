@@ -149,9 +149,9 @@ function renderQuestions() {
           <tr>
             <td class="td-small"><input type="checkbox" name="check-the-entry" class="check-the-entry"></td>
             <td class="td-small" style="color:var(--muted);font-weight:700">${q.id}</td>
-            <td><span class="code-badge">${esc(q.code)}</span></td>
-            <td>${esc(q.type)}</td>
-            <td>
+            <td class="td-small"><span class="code-badge">${esc(q.code)}</span></td>
+            <td class="td-small">${esc(q.type)}</td>
+            <td class="td-small">
               <span class="url-cell">/quiz/${esc(q.code)}</span>
               <button class="copy-url" onclick="copyUrl('${location.origin}/quiz/${esc(q.code)}')">
                 <span class="material-symbols-outlined really-small-icon">
@@ -162,11 +162,11 @@ function renderQuestions() {
             <td class="q-text">${esc(q.question_text)}</td>
             <td class="opts-list">${q.options.map((o) => esc(o)).join(" · ")}</td>
             <td class="q-answer">${q.answer.map((o) => esc(o)).join(", ")}</td>
-            <td>${q.file ? `<a href="${esc(q.file)}" target="_blank" rel="noopener">Załącznik</a>` : `<span>brak</span>`}</td>
-            <td>${esc(q.time)}s</td>
-            <td>${esc(q.difficulty)}</td>
-            <td><span class="points-badge">${q.points} pkt</span></td>
-            <td>
+            <td class="td-small">${q.file ? `<a href="${esc(q.file)}" target="_blank" rel="noopener">Załącznik</a>` : `<span>brak</span>`}</td>
+            <td class="td-small">${esc(q.time)}s</td>
+            <td class="td-small">${esc(q.difficulty)}</td>
+            <td class="td-small"><span class="points-badge">${q.points} pkt</span></td>
+            <td class="td-small">
               <div class="actions">
                 <button class="btn btn-qr btn-sm" onclick="openQR('${esc(q.code)}')"><span class="material-symbols-outlined">
                   qr_code_scanner

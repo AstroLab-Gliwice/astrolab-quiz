@@ -361,18 +361,13 @@ td {
   min-width: 100px;
 }
 
-td.td-small {
-  min-width: 0;
-  width: 50px;
-}
-
 .really-small-icon {
   font-size: 12px !important;
 }
 
 .q-text {
   font-weight: 600;
-  max-width: 1040px;
+  min-width: 180px;
 }
 
 .q-answer {
@@ -381,10 +376,14 @@ td.td-small {
   font-size: 12px;
   filter: blur(7px);
   cursor: zoom-in;
+  min-width: 120px;
 }
 
-.th-small {
-  width: 50px !important;
+th.th-small,
+td.td-small {
+  min-width: 0;
+  width: 1%;
+  white-space: nowrap;
 }
 
 .q-answer:hover {
@@ -394,6 +393,7 @@ td.td-small {
 .opts-list {
   color: var(--muted);
   font-size: 12px;
+  min-width: 200px;
 }
 
 .score-cell {
@@ -462,6 +462,10 @@ td.td-small {
 
 .overlay.open {
   display: flex;
+}
+
+.overlay.open .modal,
+.overlay.open .confirm-box {
   animation: fadeIn .2s;
 }
 
